@@ -137,7 +137,7 @@ def prepare_plan(start_fraction, end_fraction, chunk_mib):
         "index": str(INDEX.resolve()),
         "index_identity": file_identity(INDEX),
         "header": header,
-        "schema": list(FIELDS.items()),
+        "schema": [list(item) for item in FIELDS.items()],
         "total_size": total_size,
         "start_fraction": start_fraction,
         "end_fraction": end_fraction,
@@ -377,7 +377,7 @@ def main():
             manifest.read_text(encoding="utf-8")
         )
 
-        if previous != plan:
+        if previous["fingerprint"] != plan["fingerprint"]:
             raise RuntimeError(
                 "Output directory contains a different plan. "
                 "Choose another --output path."
