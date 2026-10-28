@@ -1,34 +1,47 @@
-data
 
-# Python virtual environment
+# Python
 .venv/
-
-# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
 
-# Raw eBird datasets
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Raw and processed datasets
 raw/
+parquet/
 *.gz
-*.tar
 *.gzidx
 
-# Generated analytical data
-parquet/
-database/
-logs/
+# Databases
+database/*.duckdb
+database/*.duckdb.wal
+database/*.sqlite
+database/*.sqlite3
+database/duckdb_temp/
+database/*_staging*.parquet
 
-# Generated data files
-*.sqlite
-*.sqlite-wal
-*.sqlite-shm
-*.db
-
-# Temporary files
-temp/
+# Logs and temporary files
+*.log
 *.tmp
+*.temp
 
-# Editor / OS files
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Editor and OS files
 .vscode/
+.idea/
 .DS_Store
 Thumbs.db
+
+# Generated frontend output
+dist/
+build/
+coverage/

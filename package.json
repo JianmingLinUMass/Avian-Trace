@@ -1,0 +1,21 @@
+{
+  "name": "ebird",
+  "version": "1.0.0",
+  "description": "A CS571 Data Visualization project exploring bird observation patterns across the United States from **2012 to 2026** using the eBird Basic Dataset (EBD).",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node backend/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@duckdb/node-api": "^2.0.0-r.1",
+    "express": "^5.3.0"
+  },
+  "type": "module"
+}
