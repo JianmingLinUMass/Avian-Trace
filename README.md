@@ -1,80 +1,51 @@
 # U.S. eBird Observation Explorer
 
-A CS571 Data Visualization project exploring bird observation patterns across the United States from **2012 to 2026** using the eBird Basic Dataset (EBD).
+CS571 Data Visualization project exploring bird observation patterns across the United States (2012–2026) using the eBird Basic Dataset.
 
-The project focuses on geographic distributions, seasonal patterns, species reporting trends, and comparisons across states and counties.
+## Quick Start
 
-## Dataset
+Install dependencies and start the server:
 
-| Metric | Value |
-|---|---|
-| Source | eBird Basic Dataset, September 2026 |
-| Observations | 1,350,644,619 |
-| Geographic coverage | United States |
-| Time range | 2012–2026 (through September) |
-| Retained attributes | 30 |
-| Parquet storage | 62.86 GiB |
+```bash
+npm install
+npm start
+```
 
-## Technology Stack
+The server runs at `http://127.0.0.1:3000`.
 
-- **Python:** Data extraction and preprocessing
-- **Parquet:** Compressed observation storage
-- **DuckDB:** Analytical queries and precomputed summaries
-- **D3.js:** Interactive data visualization
-- **Python API:** Data delivery to the frontend (planned)
+**Test pages:**
+
+- [D3 Visualization Test](http://127.0.0.1:3000/test.html) — Northern Cardinal observations in Massachusetts (2012–2025).
+- [API Health Check](http://127.0.0.1:3000/api/health)
+- [Database Query Test](http://127.0.0.1:3000/api/region-summary?region=US-MA)
+- [Species Trend API](http://127.0.0.1:3000/api/species-trend?region=US-MA&taxon_id=avibase-4E74AE22)
+
+Requires `database/ebird.duckdb` locally. The D3 test uses an external CDN.
+
+## Tech Stack
+
+- **Python** — Data processing
+- **Parquet** — Observation storage
+- **DuckDB** — Analytical database
+- **Node.js + Express** — Backend API
+- **D3.js** — Frontend visualizations
 
 ## Project Structure
 
 ```text
 ebird/
-├── database/
-│   └── ebird.duckdb
-├── parquet/
-│   └── production/
-├── scripts/
-│   ├── build_duckdb.py
-│   ├── build_summaries.py
-│   └── verify_duckdb.py
-├── backend/              # Planned
-├── frontend/             # Planned
-└── docs/
+├── backend/       # API and SQL queries
+├── frontend/      # D3 visualizations
+├── database/      # DuckDB database (not tracked by Git)
+├── parquet/       # Processed observations (not tracked by Git)
+├── scripts/       # Data processing and verification
+└── docs/          # Technical documentation
 ```
-
-## Data Architecture
-
-The original observations are stored in Parquet. DuckDB maintains taxonomy, state/county reference tables, and precomputed annual and monthly summaries.
-
-| Summary table | Rows |
-|---|---:|
-| `species_region_year` | 10,210,147 |
-| `species_region_month` | 48,305,753 |
-
-The planned D3.js dashboard will retrieve aggregated data through a Python API rather than loading raw observations.
-
-## Getting Started
-
-Install the Python dependencies:
-
-```bash
-pip install duckdb pyarrow pandas
-```
-
-Build and verify the database:
-
-```bash
-python scripts/build_duckdb.py
-python scripts/build_summaries.py
-python scripts/verify_duckdb.py
-```
-
-These commands assume the production Parquet files are already available.
 
 ## Notes
 
-- Observation counts represent reporting records, **not bird population estimates**.
-- Reporting patterns are influenced by birdwatching participation and effort.
-- Data for 2026 is incomplete and ends September 30.
-
-## Documentation
-
-Detailed information about data processing, database design, performance, and visualization methodology is maintained in `docs/`.
+- Data covers 2012–September 2026.
+- Observation records are not population estimates.
+- Large datasets and database files are excluded from Git. 
+    - See this Google Drive!
+- See `docs/` for data processing and database details.

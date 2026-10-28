@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eBird D3 Test</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 950px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #263238;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: #64748b;
+    }
+
+    #status {
+      min-height: 24px;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .axis text {
+      font-size: 12px;
+    }
+
+    .axis path,
+    .axis line {
+      stroke: #94a3b8;
+    }
+
+    .grid line {
+      stroke: #e2e8f0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Northern Cardinal Observations</h1>
+
+  <p>
+    Massachusetts · 2012–2025 · eBird observation records
+  </p>
+
+  <div id="status">Loading data...</div>
+
+  <svg
+    id="chart"
+    viewBox="0 0 900 480"
+    role="img"
+    aria-label="Line chart of Northern Cardinal observation records by year"
+  ></svg>
+
+  <p>
+    Observation records are influenced by birdwatching
+    activity and do not represent bird population estimates.
+  </p>
+
+  <script type="module" src="./test.js"></script>
+</body>
+</html>

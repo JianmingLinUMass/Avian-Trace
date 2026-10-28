@@ -1,4 +1,6 @@
 import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   getRegionSummary,
@@ -8,6 +10,16 @@ import {
 } from "./queries.js";
 
 const app = express();
+const __dirname = path.dirname(
+  fileURLToPath(import.meta.url)
+);
+
+const frontendPath = path.resolve(
+  __dirname,
+  "../frontend"
+);
+
+app.use(express.static(frontendPath));
 const PORT = 3000;
 
 // Local development only
