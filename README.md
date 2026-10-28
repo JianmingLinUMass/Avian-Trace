@@ -30,6 +30,12 @@ Requires `database/ebird.duckdb` locally. The D3 test uses an external CDN.
 - **Node.js + Express** — Backend API
 - **D3.js** — Frontend visualizations
 
+## Important: Python Usage
+
+Python is ONLY used for offline data processing and testing.
+
+The application uses Node.js + Express, DuckDB, and D3.js.
+
 ## Project Structure
 
 ```text
