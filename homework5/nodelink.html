@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>International Aid Network</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="nodelink.js" defer></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #chart {
+            width: 100%;
+            height: auto;
+            background: #fafafa;
+            border: 1px solid #ddd;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: white;
+            border: 1px solid #aaa;
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>International Aid Network</h1>
+
+    <svg id="chart" viewBox="0 0 1600 950"></svg>
+
+    <div id="tooltip" class="tooltip"></div>
+</body>
+</html>
