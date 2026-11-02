@@ -45,3 +45,7 @@ Thumbs.db
 dist/
 build/
 coverage/
+
+2026_Gaz_counties_national.txt
+2026_Gaz_state_national.txt
+
