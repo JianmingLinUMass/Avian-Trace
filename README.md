@@ -52,6 +52,14 @@ ebird/
 └── docs/          # Technical documentation
 ```
 
+## DuckDB Tables Structure
+
+If you ever want a quick glance for our DuckDB tables, you can do
+
+```
+python scripts/inspect_duckdb.py
+```
+
 ## Notes
 
 - Data covers 2012–September 2026.
