@@ -1,6 +1,17 @@
+
 import { query } from "./database.js";
 
-// Summary card: recorded species + observation records
+/**
+ * Get the total recorded species richness and observation records
+ * for a specific state or county within a year range.
+ *
+ * @param {string} region - Region code (e.g., "US-MA" or "US-MA-017").
+ * @param {"state"|"county"} level - Geographic level of the region.
+ * @param {number} from - Starting year (inclusive).
+ * @param {number} to - Ending year (inclusive).
+ * @returns {Promise<object>} Query result containing species_richness
+ *   and observation_records.
+ */
 export function getRegionSummary(region, level, from, to) {
   return query(`
     SELECT
@@ -16,7 +27,18 @@ export function getRegionSummary(region, level, from, to) {
   `, [level, region, from, to]);
 }
 
-// Line chart: annual trends for a taxon
+/**
+ * Get annual observation records for a particular bird taxon
+ * within a selected state or county.
+ *
+ * @param {string} region - Region code (e.g., "US-MA").
+ * @param {"state"|"county"} level - Geographic level.
+ * @param {string} taxonId - Bird taxonomic identifier (Avibase ID).
+ * @param {number} from - Starting year (inclusive).
+ * @param {number} to - Ending year (inclusive).
+ * @returns {Promise<object>} Query result containing year and
+ *   observation_records for each available year.
+ */
 export function getSpeciesTrend(region, level, taxonId, from, to) {
   return query(`
     SELECT
@@ -34,8 +56,21 @@ export function getSpeciesTrend(region, level, taxonId, from, to) {
   `, [level, region, taxonId, from, to]);
 }
 
-// Bar chart / choropleth: rank regions by richness
-export function getRichnessRanking(level, state, from, to) {
+/**
+ * Rank geographic regions by recorded species richness.
+ *
+ * When level="state", ranks all U.S. states.
+ * When level="county", ranks counties within the specified state.
+ *
+ * @param {"state"|"county"} level - Geographic level to rank.
+ * @param {string|null} stateFilter - State code (e.g., "US-MA")
+ *   used to restrict county rankings. Pass null for no filter.
+ * @param {number} from - Starting year (inclusive).
+ * @param {number} to - Ending year (inclusive).
+ * @returns {Promise<object>} Query result containing region_code
+ *   and species_richness, sorted from highest to lowest.
+ */
+export function getRichnessRanking(level, stateFilter, from, to) {
   return query(`
     SELECT
       s.region_code,
@@ -48,10 +83,23 @@ export function getRichnessRanking(level, state, from, to) {
       AND t.category = 'species'
     GROUP BY s.region_code
     ORDER BY species_richness DESC, s.region_code
-  `, [level, state, from, to]);
+  `, [level, stateFilter, from, to]);
 }
 
-// Bar chart: most frequently reported species
+/**
+ * Get the most frequently reported bird species in a region.
+ *
+ * Ranking is based on observation records, not the number of
+ * individual birds or estimated population abundance.
+ *
+ * @param {string} region - Region code (e.g., "US-MA").
+ * @param {"state"|"county"} level - Geographic level.
+ * @param {number} from - Starting year (inclusive).
+ * @param {number} to - Ending year (inclusive).
+ * @param {number} limit - Maximum number of species to return.
+ * @returns {Promise<object>} Query result containing taxon_id,
+ *   common_name, and observation_records, sorted descending.
+ */
 export function getTopSpecies(region, level, from, to, limit) {
   return query(`
     SELECT
