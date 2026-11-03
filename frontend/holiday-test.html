@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>eBird Holiday Comparison</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 30px;
+      color: #253043;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px #0000000a;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin: 25px 0;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    select {
+      padding: 9px;
+      min-width: 170px;
+      font-size: 14px;
+    }
+
+    #chart {
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    #status {
+      color: #666;
+      min-height: 20px;
+    }
+
+    #tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: #253043;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: none;
+      line-height: 1.7;
+      box-shadow: 0 3px 12px #0003;
+    }
+
+    .note {
+      color: #657083;
+      font-size: 13px;
+      margin-top: 20px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>Holiday Bird Count Comparison</h1>
+
+    <p>
+      Compare reported bird counts on Christmas Day
+      with the annual average daily count.
+    </p>
+
+    <div class="controls">
+      <label>
+        Species
+        <select id="species">
+          <option>House Sparrow</option>
+          <option>American Robin</option>
+          <option>Blue Jay</option>
+          <option>Northern Cardinal</option>
+        </select>
+      </label>
+
+      <label>
+        Region
+        <select id="region">
+          <option value="US-MA-017" data-level="county">
+            Middlesex County, MA
+          </option>
+          <option value="US-MA" data-level="state">
+            Massachusetts
+          </option>
+        </select>
+      </label>
+
+      <label>
+        Holiday
+        <select id="holiday">
+          <option>Christmas Day</option>
+          <option>Memorial Day</option>
+          <option>Independence Day</option>
+          <option>Thanksgiving Day</option>
+          <option>Labor Day</option>
+        </select>
+      </label>
+    </div>
+
+    <p id="status"></p>
+
+    <svg id="chart" viewBox="0 0 1000 550"></svg>
+
+    <p class="note">
+      Counts represent birds reported in eBird observations,
+      not estimates of bird populations. Variation may reflect
+      differences in observation effort and seasonal activity.
+    </p>
+  </main>
+
+  <div id="tooltip"></div>
+
+  <script src="holiday-test.js"></script>
+</body>
+</html>

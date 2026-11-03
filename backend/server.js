@@ -9,6 +9,8 @@ import {
   getTopSpecies
 } from "./queries.js";
 
+import registerHolidayRoutes from "./holiday-route.cjs";
+
 const app = express();
 const __dirname = path.dirname(
   fileURLToPath(import.meta.url)
@@ -124,6 +126,8 @@ app.get("/api/top-species", endpoint(
     f.region, f.level, f.from, f.to, f.limit
   )
 ));
+
+registerHolidayRoutes(app);
 
 app.listen(PORT, HOST, () => {
   console.log(`eBird API running at http://${HOST}:${PORT}`);
