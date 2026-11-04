@@ -36,7 +36,7 @@ The server runs at http://127.0.0.1:3000.
 - [API Health Check](http://127.0.0.1:3000/api/health)
 - [Region Summary](http://127.0.0.1:3000/api/region-summary?region=US-MA)
 - [Species Trend](http://127.0.0.1:3000/api/species-trend?region=US-MA&taxon_id=avibase-4E74AE22)
-- [Holiday Comparison](http://127.0.0.1:3000/api/holiday-comparison?species=House%20Sparrow&region=US-MA-017&level=county&holiday=Christmas%20Day)
+- [Holiday Comparison](http://127.0.0.1:3000/holiday-test.html)
 
 ## ⚠️ Important: Python Usage
 
