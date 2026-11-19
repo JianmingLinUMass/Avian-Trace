@@ -125,6 +125,7 @@ def main():
     parser.add_argument("--input", type=Path, default=export.DEFAULT_INPUT)
     parser.add_argument("--dataset", type=Path, default=export.DEFAULT_OUTPUT,
                         help="Completed export or its .incomplete staging directory")
+    parser.add_argument("--reference-export", type=Path, help="Also verify the original validated MA export; never scans nationwide files")
     parser.add_argument("--memory-limit", default="4GB")
     parser.add_argument("--threads", type=export.positive, default=4)
     parser.add_argument("--temp-directory", type=Path)
@@ -140,7 +141,16 @@ def main():
             raise ValueError("Validation temporary storage must be outside source and dataset")
         name = dataset.name.removesuffix(".incomplete")
         with export.export_lock(dataset.with_name(name)):
-            report = validate_export(dataset, source, args.memory_limit, args.threads, temporary)
+            if export.read_json(dataset / "manifest.json").get("layout") == "parquet_ma":
+                if __package__:
+                    from .massachusetts_layout import validate_mirror
+                else:
+                    from massachusetts_layout import validate_mirror
+                if args.reference_export and export.overlaps(temporary, args.reference_export.resolve()):
+                    raise ValueError("Validation scratch must be outside the reference export")
+                report = validate_mirror(dataset, args.memory_limit, args.threads, temporary, args.reference_export)
+            else:
+                report = validate_export(dataset, source, args.memory_limit, args.threads, temporary)
         report.update(export.dataset_statistics(dataset))
         print(json.dumps(report, indent=2))
     except KeyboardInterrupt:

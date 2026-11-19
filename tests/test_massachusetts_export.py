@@ -345,7 +345,7 @@ class MassachusettsExportTests(unittest.TestCase):
     def test_cli_subset_and_fresh_validation(self):
         root = Path(__file__).resolve().parents[1]
         command = [sys.executable, str(root / "scripts" / "extract_massachusetts.py"),
-            "--input", str(self.source), "--output", str(self.output), "--max-files", "1",
+            "--layout", "legacy", "--input", str(self.source), "--output", str(self.output), "--max-files", "1",
             "--memory-limit", "256MB", "--threads", "1"]
         result = subprocess.run(command, capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)

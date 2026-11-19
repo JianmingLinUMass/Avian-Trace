@@ -7,6 +7,11 @@ from pathlib import Path
 import pyarrow as pa  # type: ignore
 import pyarrow.parquet as pq  # type: ignore
 
+if __package__:
+    from .prototype_normalization import CATALOG_BATCH_SIZE, integer_or_none, float_or_none
+else:
+    from prototype_normalization import CATALOG_BATCH_SIZE, integer_or_none, float_or_none
+
 # ============================================================
 # Configuration
 # ============================================================
@@ -18,7 +23,7 @@ DATABASE = ROOT / "database" / "ebird.sqlite"
 PARQUET_DIR = ROOT / "parquet"
 
 ROW_LIMIT = 100_000
-BATCH_SIZE = 10_000
+BATCH_SIZE = CATALOG_BATCH_SIZE
 
 DATABASE.parent.mkdir(parents=True, exist_ok=True)
 PARQUET_DIR.mkdir(parents=True, exist_ok=True)
@@ -76,20 +81,6 @@ CREATE TABLE IF NOT EXISTS observations (
 # ============================================================
 # Helpers
 # ============================================================
-
-def integer_or_none(value):
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        return None
-
-
-def float_or_none(value):
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return None
-
 
 def save_batch(batch):
     if not batch:

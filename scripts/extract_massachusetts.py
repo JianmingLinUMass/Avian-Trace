@@ -17,7 +17,7 @@ import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = ROOT / "parquet" / "production"
-DEFAULT_OUTPUT = ROOT / "parquet" / "massachusetts"
+DEFAULT_OUTPUT = ROOT / "parquet_ma"
 FORMAT_VERSION = 1
 PATTERN = "part_*.parquet"
 STATE_CODE = "US-MA"
@@ -226,7 +226,7 @@ def describe_batch(folder, schema):
 def remove_owned_directory(staging, path):
     # Only computed, immediate batch/scratch directories inside this export may be removed.
     if (path.parent.resolve() != staging.resolve()
-            or not re.fullmatch(r"(?:batch_\d{5}(?:\.pending)?|\.duckdb_tmp)", path.name)
+            or not re.fullmatch(r"(?:batch_\d{5}(?:\.pending)?|\.duckdb_tmp|\.source_export)", path.name)
             or is_link(path) or path.resolve().parent != staging.resolve()):
         raise ValueError(f"Unsafe batch cleanup target: {path}")
     if path.exists():
@@ -365,6 +365,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--layout", choices=["mirror", "legacy"], default="mirror")
+    parser.add_argument("--reuse-export", type=Path, help="Copy an existing validated legacy MA export; no nationwide scan")
+    parser.add_argument("--prototype-dir", type=Path, default=ROOT / "parquet")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-files", type=positive, help="Subset test only; needs a separate --output")
     parser.add_argument("--batch-size", type=positive, default=32)
@@ -374,7 +377,16 @@ def main():
     parser.add_argument("--temp-directory", type=Path)
     args = parser.parse_args()
     try:
-        run_export(args)
+        if args.layout == "legacy":
+            if args.reuse_export:
+                raise ValueError("--reuse-export requires mirror layout")
+            run_export(args)
+        else:
+            if __package__:
+                from .massachusetts_layout import run_mirror
+            else:
+                from massachusetts_layout import run_mirror
+            run_mirror(args)
     except KeyboardInterrupt:
         print("Interrupted. Staging/checkpoints retained; rerun with --resume.", file=sys.stderr)
         return 130

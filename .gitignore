@@ -14,6 +14,10 @@ yarn-error.log*
 # Raw and processed datasets
 raw/
 parquet/
+parquet_ma/
+parquet_ma.incomplete/
+.parquet_ma.lock
+.parquet_ma.validation-tmp/
 *.gz
 *.gzidx
 
