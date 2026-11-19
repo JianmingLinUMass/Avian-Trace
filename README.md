@@ -26,6 +26,12 @@ npm start
 
 The server runs at http://127.0.0.1:3000.
 
+To run on another port: do 
+
+```bash
+$env:PORT = 3001; npm start
+```
+
 ### Visualization Test Pages
 
 - [Species Trend Visualization](http://127.0.0.1:3000/test.html) — Northern Cardinal observations in Massachusetts (2012–2025).

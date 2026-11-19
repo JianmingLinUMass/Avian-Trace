@@ -28,7 +28,7 @@ const frontendPath = path.resolve(
 );
 
 app.use(express.static(frontendPath));
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 // Local development only
 const HOST = "127.0.0.1";
