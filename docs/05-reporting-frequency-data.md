@@ -205,9 +205,9 @@ Tests cover cross-file duplicates, non-species denominators, incomplete/empty ID
 
 ## Completion flags and publication recommendation
 
-**Publication is a separate, unapproved milestone. Do not publish during consolidation.** The validated nationwide candidates still contain `false` in their new completion/coverage flags. Preserve those files, their hashes, all checkpoints, originals and validation reports exactly. The publisher now refuses incomplete flags; a read-only validation pass does not activate them.
+**Publication completed after separate approval on 2026-11-20.** The immutable validated nationwide candidates still contain `false` in their new completion/coverage flags; only separate publication copies were activated and installed. Preserve those files, their hashes, all checkpoints, originals and validation reports exactly. The publisher now refuses incomplete flags; a read-only validation pass does not activate them.
 
-Recommended procedure after explicit publication/path approval:
+Procedure used after explicit publication/path approval:
 
 1. Make a separate publication-generation copy of the three immutable candidates and verify its initial hashes against the successful audit. Retain the original candidates and reports unchanged.
 2. In those copies only, set `reporting_frequency_build.complete` and `reporting_frequency_coverage.complete` to true for the validated generation. Do not change build IDs, source fingerprints, policy fields, coverage keys or any existing/frequency count table. Keep the daily database byte-identical.
@@ -215,4 +215,34 @@ Recommended procedure after explicit publication/path approval:
 4. Review explicit source, destination, independent backup and rollback paths. Historical manifests retain their original proposed destinations; do not rewrite them or blindly run `--publish-only` against an obsolete destination. Publication of these generations needs a separately reviewed destination/activation plan.
 5. Stop affected backends before replacement. Preserve verified backups of all installed files, stage closed copies beside the approved destinations, recheck hashes, and use a publication journal. Three file replacements are not a single filesystem transaction. After an interruption, restore the entire previous trio from the same verified backup generation before restarting; never mix generations.
 
-No activation copies, completion updates, installed replacements or publication steps are performed by this consolidation. `database/` and `database_ma/` remain distinct, and the existing application does not automatically switch to frequency tables.
+The consolidation itself did not publish databases. The subsequent approved publication is recorded below. `database/` and `database_ma/` remain distinct, and existing visualizations do not automatically switch to frequency calculations.
+
+
+## Verified publication record (2026-11-20)
+
+Both database installations succeeded. All 32 original tables, their contents and catalog metadata were preserved. Each dataset has all eight frequency summaries and complete coverage flags. The daily databases remain byte-identical to their originals. Candidates, checkpoints and original validation reports remain unchanged. No aggregation or raw-Parquet validation was rerun.
+
+The machine-local report is `.reporting-frequency/publications/20261120T073533175318Z/resume-20261120T150224744393Z/publication-report.json`; it records all installed/candidate/copy/backup hashes and verification evidence. Independent original backups are in `.reporting-frequency/publications/20261120T073533175318Z/backups/database/` and `.reporting-frequency/publications/20261120T073533175318Z/backups/database_ma/`, with hashes in `.reporting-frequency/publications/20261120T073533175318Z/backup.json`. These generated artifacts are ignored by Git and must be retained locally.
+
+| Installed file | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `database/ebird.duckdb` | 725,626,880 | `fd73fcbd43871587589289b650a98b8a7b56c5b28c02d9e1a21815ff2de9e65b` |
+| `database/ebird_daily.duckdb` | 2,343,841,792 | `86b9249c24337964f7b7ad7817c908957b7384e8301b5171b2d1f152a864f1ec` |
+| `database/ebird_locations.duckdb` | 5,183,909,888 | `95763c39ac0c2518ea0d634ff9e5e79314e54fb9c6845d82d7fe6b69ed516db0` |
+| `database_ma/ebird.duckdb` | 8,663,040 | `a8fe75f1b6ef56271a7fda95b6065c4e7bb30b6aeaff37ce89f41a7657d1fc9b` |
+| `database_ma/ebird_daily.duckdb` | 11,022,336 | `5cb3f13c6cf929e392ae845b08c8cb14e137d9e84184fb2ecc06d9507f681635` |
+| `database_ma/ebird_locations.duckdb` | 48,246,784 | `0d7f41321cac2e412a1cc73660d4e292adbe2b0d51eda0ef65d47aea0a21d9bc` |
+
+Verification passed: 40 Python tests, 52 Node tests, 17 dashboard API requests per dataset, existing standalone/dashboard page availability, and exact Massachusetts reconciliation across all eight frequency tables. These HTTP checks do not establish a new visual browser-rendering review. Only the erroneous fixed state-list size assertion was removed; approved numeric conversion in the smoke-test parser accommodates existing string-valued database counts without changing the API.
+
+Publication uses a separate lock file, closed database handles during replacement, destination-local staging, a journal and automatic rollback on failure. All six original backup hashes were verified before replacement. Historical failed rehearsal/rollback reports remain preserved; the successful transaction report above and the parent `publication-success.json` identify the final installation.
+
+### Rollback this installation
+
+Stop applications using either database directory, retain all evidence and backups, then run from the repository root:
+
+```powershell
+py .reporting-frequency/publications/20261120T073533175318Z/resume-20261120T150224744393Z/publication.py rollback
+```
+
+This restores all six files from the same verified original backup generation; never mix generations or bypass file locks. Check the rollback journal, restored SHA-256 values and database readability before restarting applications. The command is a recovery instruction, not part of normal startup. Do not rerun publication or delete the retained copies/backups.

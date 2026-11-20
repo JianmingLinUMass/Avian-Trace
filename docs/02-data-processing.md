@@ -209,7 +209,8 @@ The additive T2/T4 preparation scripts are `scripts/build_reporting_frequency.py
 `scripts/reporting_frequency.py`, and `scripts/validate_reporting_frequency.py`.
 They retain legacy observation/richness/holiday tables and prepare separate
 monthly and annual complete-checklist frequency summaries. The completed
-production candidates remain unpublished.
+production candidates remain immutable; the separately approved publication is recorded in
+`05-reporting-frequency-data.md`.
 
 See [Reporting-frequency data](05-reporting-frequency-data.md) for the definition,
 all eight table schemas, runnable T2/T4 SQL, portable nationwide/Massachusetts
