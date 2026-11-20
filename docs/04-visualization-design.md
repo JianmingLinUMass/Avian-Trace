@@ -1,5 +1,24 @@
 # Visualization Design
 
+## Reporting-frequency preparation for T2 and T4
+
+A separate EBD-derived metric is prepared for 2012-2025:
+`100 * distinct complete checklists reporting a species / distinct complete checklists represented in EBD`.
+Completeness is `complete_checklist = '1'`; species numerators use
+`category = 'species'`, while denominators retain all taxon categories. Checklists
+absent from EBD, including zero-observation checklists, are excluded. This is not
+an exact SED-based denominator or a measure of bird abundance.
+
+This preparation does not switch current charts or APIs to frequency. Existing
+T2 observation counts, T4 richness/UpSet calculations, filters, subscriptions,
+URLs and dashboard layout remain unchanged. Raw dates are preserved and annual
+counts are independently distinct, never sums of monthly counts. Exact pooled
+seasons/periods/hotspot combinations need aggregation at the requested grain.
+
+Schemas, SQL, build/validation procedures and limitations are maintained once in
+[Reporting-frequency data](05-reporting-frequency-data.md). The centralized
+standalone visualization URL table below remains authoritative.
+
 ## Frontend composition and reusable views
 
 Each visualization has one reusable mounted view, used by its existing standalone page and the combined dashboard with an injected shared store. There are no separate standalone/dashboard chart implementations. The refactor preserves the existing chart appearance, defaults, calculations, APIs, filter semantics, and HTML page URLs. Standalone presentation remains the default; compact presentation is opt-in. The combined dashboard composes these same views.

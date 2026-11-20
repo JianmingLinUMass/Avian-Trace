@@ -51,3 +51,8 @@ coverage/
 2026_Gaz_counties_national.txt
 2026_Gaz_state_national.txt
 
+
+# Generated reporting-frequency databases, work, checkpoints and scratch
+/database_ma/
+/.reporting-frequency/
+.reporting-frequency.lock
