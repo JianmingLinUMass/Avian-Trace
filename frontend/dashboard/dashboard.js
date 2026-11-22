@@ -40,7 +40,8 @@ export function mountDashboard({ container, store, data, geography, taxa, d3, to
         <section class="dashboard-panel" data-panel="holiday" aria-label="T3 Holiday Observation Patterns"></section>
       </div>
       <div class="dashboard-row dashboard-row--hotspot">
-        <section class="dashboard-panel" data-panel="hotspots" aria-label="T4 Birding Itinerary Planner"></section>
+        <section class="dashboard-panel" data-panel="hotspots" aria-label="T4 Birding Itinerary Bar Chart"></section>
+        <section class="dashboard-panel" data-panel="hotspot-details" aria-label="T4 Itinerary Details"></section>
       </div>
     </div>`;
   container.append(root);
@@ -73,7 +74,7 @@ export function mountDashboard({ container, store, data, geography, taxa, d3, to
   mountPanel("trends", mountObservationTrends, "t2");
   mountPanel("holiday", mountHolidayObservationPatterns, "t3");
   mountPanel("analysis", mountSeasonalSpeciesHeatmap, "t2Heatmap");
-  mountPanel("hotspots", mountHotspotFrequency, null, { initialCountyScope });
+  mountPanel("hotspots", mountHotspotFrequency, null, { initialCountyScope, detailsHost: root.querySelector('[data-panel="hotspot-details"]') });
   return {
     root, ready: Promise.all(panels.map(panel => panel.ready)),
     destroy() {

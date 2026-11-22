@@ -28,8 +28,20 @@ html:has(body.dashboard-page) { scroll-padding-top: 112px; }
 .dashboard-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .dashboard-row--geography { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-auto-rows: 440px; }
 .dashboard-row--temporal { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 330px; }
-.dashboard-row--hotspot { grid-template-columns: minmax(0, 1fr); }
+.dashboard-row--hotspot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dashboard-panel[data-panel="hotspots"] > .visualization-view[data-presentation="compact"] { height: auto; min-height: 380px; overflow: visible; }
+.dashboard-panel[data-panel="hotspot-details"] {
+  box-sizing: border-box;
+  min-height: 0;
+  max-height: 380px;
+  padding: 10px 12px;
+  border: 1px solid #a8c3ac;
+  border-radius: 8px;
+  background: white;
+  color: #20352d;
+  font: 12px/1.4 system-ui, sans-serif;
+  overflow-y: auto;
+}
 .dashboard-panel { min-width: 0; min-height: 0; }
 .dashboard-panel > .visualization-view[data-presentation="compact"] { border-color: #d4e0d7; }
 .dashboard-panel[data-panel="hotspots"] > .visualization-view[data-presentation="compact"] { border-color: #a8c3ac; }
@@ -94,7 +106,18 @@ html:has(body.dashboard-page) { scroll-padding-top: 112px; }
   }
   .dashboard-shell[data-layout="fit"] .dashboard-row--geography { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
   .dashboard-shell[data-layout="fit"] .dashboard-row--temporal { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .dashboard-shell[data-layout="fit"] .dashboard-row--hotspot { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-shell[data-layout="fit"] .dashboard-row--hotspot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-shell[data-layout="fit"] .dashboard-panel[data-panel="hotspot-details"] {
+    max-height: none;
+    height: 100%;
+    overflow-y: auto;
+    padding: 8px;
+    font-size: 11px;
+  }
+  .dashboard-shell[data-layout="fit"] .itinerary-bars__plot { min-height: 0; }
+  .dashboard-shell[data-layout="fit"] .dashboard-panel[data-panel="hotspots"] .itinerary-bars { --row-head: 1.3em; --row-foot: 1.3em; }
+  .dashboard-shell[data-layout="fit"] .itinerary-bars__yaxis { font-size: 9px; }
+  .dashboard-shell[data-layout="fit"] .itinerary-bars__tick--minor { display: none; }
   .dashboard-shell[data-layout="fit"] .county-choropleth__legend { flex-basis: 45px; height: 45px; }
   .dashboard-shell[data-layout="fit"] .county-choropleth__map { height: calc(100% - 45px); }
   .dashboard-shell[data-layout="fit"] .dashboard-panel[data-panel="hotspots"] > .visualization-view[data-presentation="compact"] {
@@ -114,7 +137,4 @@ html:has(body.dashboard-page) { scroll-padding-top: 112px; }
     flex: 1 1 0;
     overflow: auto;
   }
-  .dashboard-shell[data-layout="fit"] .itinerary-bars__row { min-height: 19px; padding-block: 1px; }
-  .dashboard-shell[data-layout="fit"] .itinerary-bars__rows { max-height: 112px; }
-  .dashboard-shell[data-layout="fit"] .itinerary-result-details { margin-top: 2px; padding-top: 2px; }
 }

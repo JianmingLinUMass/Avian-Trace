@@ -24,10 +24,11 @@ const HTML = `
 
 const number = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
-export function mountHotspotFrequency({ container, store, data, taxa = new Map(), presentation = "standalone", initialCountyScope = false }) {
+export function mountHotspotFrequency({ container, store, data, taxa = new Map(), presentation = "standalone", initialCountyScope = false, detailsHost: providedDetailsHost }) {
   const frame = createVisualizationFrame({ container, html: HTML, presentation, className: "hotspot-frequency" });
   const { elements, pickerTrigger } = frame;
   const plot = elements["frequency-plot"];
+  const detailsHost = providedDetailsHost ?? plot;
   const document = plot.ownerDocument;
   const status = elements["frequency-status"];
   const monthSelect = elements["frequency-month"];
@@ -49,7 +50,7 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
   const picker = createHotspotPicker({ container: elements["hotspot-picker"], store, loadLocations: data.loadHotspots });
   let request = 0;
   let hotspots, countyPlan, referenceYears, countySpecies;
-  let previewKey, speciesQuery = "", detailsOpen = false;
+  let previewKey, speciesQuery = "";
 
   function render() {
     if (!hotspots && !countyPlan) return;
@@ -65,6 +66,7 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     const plans = countyPlan?.itineraries ?? rankItineraries(hotspots, stops);
     const selected = countyPlan ? plans[stops - 1] : plans.find(itinerary => itinerary.key === previewKey) ?? plans[0];
     plot.replaceChildren();
+    detailsHost.replaceChildren();
     if (!selected) {
       status.textContent = eligible + " hotspots have data for " + period + ". Choose fewer stops or another month.";
       return;
@@ -74,21 +76,18 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
       : plans.length + (plans.length === 1 ? " combination" : " combinations") + " · " + stops + (stops === 1 ? " stop" : " stops") + " · " + period;
     plot.append(renderItineraryBars(document, { plans, selected, countyWide: Boolean(countyPlan), onSelect(plan, index) {
       const scroller = plot.querySelector(".itinerary-bars__rows");
-      const scrollTop = scroller.scrollTop;
+      const scrollLeft = scroller.scrollLeft;
       if (countyPlan) stopSelect.value = String(index + 1);
       else previewKey = plan.key;
       render();
-      plot.querySelector(".itinerary-bars__rows").scrollTop = scrollTop;
+      plot.querySelector(".itinerary-bars__rows").scrollLeft = scrollLeft;
       plot.querySelector('.itinerary-bars__row[aria-pressed="true"]')?.focus({ preventScroll: true });
     } }));
 
-    const details = document.createElement("details");
+    const details = document.createElement("section");
     details.className = "itinerary-result-details";
-    details.open = detailsOpen;
-    details.addEventListener("toggle", () => { if (details.isConnected) detailsOpen = details.open; });
-    const summary = document.createElement("summary");
-    summary.textContent = "Itinerary details";
-    details.append(summary, renderItineraryStops(document, selected));
+    details.setAttribute("aria-label", "Itinerary details");
+    details.append(renderItineraryStops(document, selected));
     if (excluded.length || (countyPlan && countyPlan.totalHotspots > eligible)) {
       const note = document.createElement("p");
       note.className = "itinerary-note";
@@ -99,7 +98,7 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     }
     const speciesHotspots = countyPlan ? selected.hotspots.map(hotspot => countySpecies.get(hotspot.id)) : selected.hotspots;
     details.append(createItinerarySpeciesPanel(document, speciesHotspots, taxa, period, speciesQuery, query => { speciesQuery = query; }));
-    plot.append(details);
+    detailsHost.append(details);
   }
 
   async function update() {
@@ -118,6 +117,7 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     countyPlan = undefined;
     previewKey = undefined;
     plot.replaceChildren();
+    detailsHost.replaceChildren();
     plot.setAttribute("aria-busy", "false");
     if (!countyCode || (!useCounty && !ids.length)) {
       status.textContent = countyCode ? "Select up to ten hotspots or turn on All county hotspots." : "Select a county to find hotspots.";
@@ -161,6 +161,7 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     allHotspots.removeEventListener("change", update);
     stopSelect.removeEventListener("change", render);
     picker.destroy();
+    if (providedDetailsHost) providedDetailsHost.replaceChildren();
     frame.destroy();
   } };
 }

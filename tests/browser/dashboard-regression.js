@@ -182,7 +182,8 @@ async function testFrequencyAndItineraries() {
     assert(hotspotRows()[0].getAttribute("aria-label").includes("Acton Arboretum") &&
       hotspotRows()[0].getAttribute("aria-label").includes("Alewife Brook Reservation"), "Incorrect best itinerary");
     assert(find(".itinerary-note").textContent.includes("Ada Govan Bird Sanctuary"), "Missing checklist coverage not disclosed");
-    assert(!find(".itinerary-result-details").open, "Itinerary details should start collapsed");
+    assert(find(".itinerary-stop-list")?.children.length && find(".itinerary-result-details")?.getAttribute("aria-label") === "Itinerary details",
+      "Itinerary details should render directly without expanding");
     const originalTable = find('[data-role="frequency-plot"] .itinerary-bars');
     store.setShared({ taxonId: "avibase-4E74AE22" });
     assert(originalTable === find('[data-role="frequency-plot"] .itinerary-bars'), "Species filter must not change multi-species itineraries");
