@@ -1,3 +1,5 @@
+import { readReportingFrequency } from "../../helpers/reporting-frequency.js";
+
 export const MONTH_NAMES = Object.freeze([
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December"
@@ -31,4 +33,20 @@ export function buildSpeciesHeatmap(rows, sortOrder = "total") {
     const byName = alphabetical.compare(a.speciesName, b.speciesName) || alphabetical.compare(a.taxonId, b.taxonId);
     return sortOrder === "alpha" ? byName : b.total - a.total || byName;
   });
+}
+
+/** Adapt frequency rows to the same cohort ordering and cell validation as the original heatmap. */
+export function buildFrequencyHeatmap(rows, sortOrder) {
+  const byTaxon = new Map();
+  const ranked = buildSpeciesHeatmap(rows.map(row => {
+    if (!byTaxon.has(row.taxon_id)) byTaxon.set(row.taxon_id, new Map());
+    byTaxon.get(row.taxon_id).set(Number(row.month), readReportingFrequency(row));
+    return { ...row, total_observation_records: row.total_reporting, observation_records: row.reporting_checklists };
+  }), sortOrder);
+  return ranked.map(item => ({
+    ...item,
+    cells: item.cells.map(({ observationRecords, ...cell }) => ({
+      ...cell, frequency: byTaxon.get(item.taxonId).get(cell.month) ?? null
+    }))
+  }));
 }

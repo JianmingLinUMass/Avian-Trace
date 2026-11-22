@@ -22,7 +22,7 @@ const cases = [
   ["county bars",mountCountyRichnessBar,"loadCountyRichness",".county-bars__county"],
   ["choropleth",mountCountyChoropleth,"loadCountyRichness",".county-choropleth__map .county"],
   ["trends",mountObservationTrends,"loadSpeciesTrend",".observation-trends__point"],
-  ["heatmap",mountSeasonalSpeciesHeatmap,"loadSpeciesHeatmap",".species-heatmap__cell"],
+  ["heatmap",mountSeasonalSpeciesHeatmap,"loadSpeciesReportingFrequency",".species-heatmap__cell"],
   ["holidays",mountHolidayObservationPatterns,"loadHolidayObservations",".holiday-patterns__year"],
   ["combinations",mountLocationCombinations,"loadHotspotSpecies",".combination-chart__combination"],
   ["UpSet",mountHotspotSpeciesOverlap,"loadHotspotSpecies",".upset-chart__column"]

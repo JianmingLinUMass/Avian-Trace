@@ -12,3 +12,4 @@
 
 .species-heatmap-page .filter-header select[data-filter-path="charts.t2Heatmap.speciesCount"] { width: 72px; }
 .species-heatmap-page .filter-header select[data-filter-path="charts.t2Heatmap.sortOrder"] { width: 168px; }
+.species-heatmap-page[data-presentation="compact"] .filter-header select[data-filter-path="charts.t2Heatmap.sortOrder"] { width: 102px; }

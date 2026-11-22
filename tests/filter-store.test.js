@@ -12,7 +12,7 @@ function watch(store, chartId) {
 test("approved defaults keep shared and local filters separate", () => {
   const state = createFilterStore().getState();
   assert.deepEqual(state.shared, { stateCode: null, countyCode: null, taxonId: null, startYear: 2012, endYear: 2025 });
-  assert.deepEqual(state.charts, { t1Map: {}, t1: { sortOrder: "desc" }, t2: { season: "all" }, t2Heatmap: { speciesCount: 15, sortOrder: "total" }, t3: {}, t4UpSet: {}, t4: { candidateLocationIds: [], selectedCombinationIds: [], numberOfLocations: 3, sortOrder: "desc" } });
+  assert.deepEqual(state.charts, { t1Map: {}, t1: { sortOrder: "desc" }, t2: { season: "all" }, t2Heatmap: { speciesCount: 15, sortOrder: "total" }, t3: {}, t4UpSet: {}, t4Frequency: {}, t4: { candidateLocationIds: [], selectedCombinationIds: [], numberOfLocations: 3, sortOrder: "desc" } });
   assert.deepEqual(CHART_FILTER_DEFINITIONS.t2.season.options.map(({ value, months }) => [value, months]), [
     ["all", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ["spring", [3, 4, 5]],
     ["summer", [6, 7, 8]], ["fall", [9, 10, 11]], ["winter", [12, 1, 2]]

@@ -14,7 +14,14 @@ function bounds(node,container){const box=node.getBoundingClientRect(),parent=co
 async function run(){
  const [geography,taxa,topology]=await Promise.all([api.loadGeographicOptions(),loadTaxonNameMap(),d3.json("/data/counties-10m.json")]);
  const snapshots={},data=Object.fromEntries(Object.entries(api).map(([name,fn])=>[name,async(...args)=>{const value=await fn(...args);snapshots[name]=value;return value;}]));data.loadCountyGeometry=async()=>topology;
- const loaders={map:"loadCountyRichness",bars:"loadCountyRichness",trends:"loadSpeciesTrend",holiday:"loadHolidayObservations",combinations:"loadHotspotSpecies",heatmap:"loadSpeciesHeatmap",upset:"loadHotspotSpecies"};
+ const loadCountyRichness = data.loadCountyRichness;
+ data.loadCountyRichness = (state, ...args) => state === "US-TX"
+   ? Promise.resolve(Array.from({length:254}, (_, i) => ({
+       region_code: "US-TX-" + String(i + 1).padStart(3, "0"),
+       county_name: "Long County Name Kept in Full " + (i + 1), species_richness: i, observation_records: i * 10
+     })))
+   : loadCountyRichness(state, ...args);
+ const loaders={map:"loadCountyRichness",bars:"loadCountyRichness",trends:"loadSpeciesTrend",holiday:"loadHolidayObservations",combinations:"loadHotspotSpecies",heatmap:"loadSpeciesReportingFrequency",upset:"loadHotspotSpecies"};
  for(const item of compactCases){
   const normalHost=host(item),normal=item.mount({container:normalHost,store:createStore(),data,geography,taxa,d3,topojson});await normal.ready;
   const expected=normal.root.querySelectorAll(item.selector).length;assert(expected>0,item.id+" standalone did not render");
@@ -40,7 +47,9 @@ async function run(){
    const legendBox=legend.getBoundingClientRect();assert([...legend.querySelectorAll("text")].every(text=>{const b=text.getBoundingClientRect();return b.top>=legendBox.top-1&&b.bottom<=legendBox.bottom+1;}),"Heatmap legend text clipped");body.scrollTop=body.scrollHeight;await settle();assert(months.getBoundingClientRect().top===top&&legend.getBoundingClientRect().bottom===bottom,"Heatmap header/legend moved with rows");
   }
   if(item.id==="bars"){
-   store.setShared({stateCode:"US-TX"});await until(()=>view.root.querySelectorAll(item.selector).length===254);const scroll=view.root.querySelector('.county-bars__viewport');assert(scroll.scrollWidth>scroll.clientWidth,"Large county rankings do not scroll");
+   store.setShared({stateCode:"US-TX"});await until(()=>view.root.querySelectorAll(item.selector).length===254);const scroll=view.root.querySelector('.county-bars__viewport');assert(scroll.scrollHeight>scroll.clientHeight && scroll.scrollWidth<=scroll.clientWidth,"Large county rankings must scroll vertically");
+   assert(view.root.querySelectorAll(".county-bars__name").length===254 &&
+     [...view.root.querySelectorAll(".county-bars__name")].some(label=>label.textContent==="Long County Name Kept in Full 254"),"Long labels must remain complete");
   }
   if(item.id==="combinations"){
    const catalog=await data.loadHotspots("US-MA-017");store.setChart("t4",{candidateLocationIds:catalog.locations.slice(0,10).map(row=>row.locality_id),numberOfLocations:5});

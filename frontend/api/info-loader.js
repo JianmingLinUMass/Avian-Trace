@@ -57,3 +57,15 @@ export function loadHotspots(countyCode, search = "", page = 1) {
 export function loadHotspotSpecies(countyCode, locationIds) {
   return fetchAPI("/api/hotspot-species", { countyCode, locationIds: locationIds.join(",") });
 }
+
+export function loadSpeciesReportingFrequency(regionCode, regionLevel, startYear, endYear, speciesCount) {
+  return fetchAPI("/api/species-reporting-frequency", { regionCode, regionLevel, startYear, endYear, speciesCount });
+}
+
+export function loadHotspotReportingFrequency(countyCode, locationIds, month) {
+  return fetchAPI("/api/hotspot-reporting-frequency", { countyCode, locationIds: locationIds.join(","), month });
+}
+
+export function loadCountyItineraries(countyCode, month) {
+  return fetchAPI("/api/county-itineraries", { countyCode, month });
+}

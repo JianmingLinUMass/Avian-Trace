@@ -1,4 +1,5 @@
 import { getFilterEntries } from "../filters/filter-definitions.js";
+import { createSearchableSelect } from "./searchable-select.js";
 
 let nextHeaderId = 0;
 
@@ -59,12 +60,18 @@ export function createFilterHeader({ container, store, chartId, scope = "all", o
         errorMessage.hidden = false;
         control.setAttribute("aria-invalid", "true");
         control.setAttribute("aria-describedby", errorMessage.id);
+        controls.get(path).search?.sync();
       }
     }
     control.addEventListener("change", onChange);
     cleanups.push(() => control.removeEventListener("change", onChange));
     controls.set(path, { control, choices: [] });
     group.append(label, control);
+    if (key === "countyCode" || key === "taxonId") {
+      const search = createSearchableSelect({ select: control, label });
+      controls.get(path).search = search;
+      cleanups.push(() => search.destroy());
+    }
     root.append(group);
   });
   root.append(errorMessage);
@@ -73,9 +80,10 @@ export function createFilterHeader({ container, store, chartId, scope = "all", o
   function clearError() {
     errorMessage.hidden = true;
     errorMessage.textContent = "";
-    controls.forEach(({ control }) => {
+    controls.forEach(({ control, search }) => {
       control.removeAttribute("aria-invalid");
       control.removeAttribute("aria-describedby");
+      search?.sync();
     });
   }
 
@@ -102,6 +110,7 @@ export function createFilterHeader({ container, store, chartId, scope = "all", o
         }));
       }
       item.control.value = value === null ? "" : String(value);
+      item.search?.sync();
     });
   }
 

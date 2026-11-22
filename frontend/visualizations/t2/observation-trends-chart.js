@@ -30,8 +30,8 @@ export function createObservationTrendsChart({ d3 = globalThis.d3, sizing = {}, 
 
   function render(model) {
     const width = Math.max(compact ? 320 : 720, container.clientWidth);
-    const height = compact ? Math.max(150, container.clientHeight) : (sizing.height ?? 480);
-    const margin = compact ? { left:68, right:16, top:12, bottom:34 } : { ...MARGIN, top:24, bottom:60 };
+    const height = compact ? Math.max(95, container.clientHeight) : (sizing.height ?? 480);
+    const margin = compact ? { left:79, right:16, top:12, bottom:34 } : { ...MARGIN, top:24, bottom:60 };
     const { series, startYear, endYear } = model;
     current = { ...model, viewportWidth: container.clientWidth, viewportHeight: container.clientHeight };
     hideTooltip();
@@ -41,7 +41,7 @@ export function createObservationTrendsChart({ d3 = globalThis.d3, sizing = {}, 
       .range([margin.left, width - margin.right]);
     const y = d3.scaleLinear().domain([0, Math.max(1, d3.max(series, point => point.observationRecords) || 0)])
       .nice().range([height - margin.bottom, margin.top]);
-    const tickCount = Math.min(6, y.domain()[1]);
+    const tickCount = Math.min(compact && height < 145 ? 3 : 6, y.domain()[1]);
     const grid = svg.append("g").attr("class", "observation-trends__grid").attr("aria-hidden", "true")
       .attr("transform", "translate(" + margin.left + ",0)")
       .call(d3.axisLeft(y).ticks(tickCount).tickSize(-(width - margin.left - margin.right)).tickFormat(""));
@@ -53,11 +53,11 @@ export function createObservationTrendsChart({ d3 = globalThis.d3, sizing = {}, 
       .attr("transform", "translate(" + margin.left + ",0)")
       .call(d3.axisLeft(y).ticks(tickCount).tickFormat(format));
     svg.append("text").attr("class", "observation-trends__axis-label")
-      .attr("x", margin.left + (width - margin.left - margin.right) / 2).attr("y", height - 14)
+      .attr("x", margin.left + (width - margin.left - margin.right) / 2).attr("y", height - (compact ? 5 : 14))
       .attr("text-anchor", "middle").text("Year");
     svg.append("text").attr("class", "observation-trends__axis-label")
       .attr("transform", "rotate(-90)").attr("x", -(height - margin.bottom + margin.top) / 2)
-      .attr("y", 20).attr("text-anchor", "middle").text(compact ? "Observation records" : "Number of observation records");
+      .attr("y", compact ? 12 : 20).attr("text-anchor", "middle").text(compact ? "Observation records" : "Number of observation records");
     const line = d3.line().defined(point => point.observationRecords !== null)
       .x(point => x(point.year)).y(point => y(point.observationRecords));
     svg.append("path").datum(series).attr("class", "observation-trends__line")

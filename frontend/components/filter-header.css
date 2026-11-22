@@ -35,6 +35,27 @@
   font-size: 13px;
 }
 .filter-header input { width: 76px; }
+.filter-header input.filter-header__search { width: 164px; }
+.filter-header input.filter-header__search[data-search-for="shared.taxonId"] { width: 190px; }
+.filter-header input:disabled { background: #e5e7eb; cursor: not-allowed; }
+.filter-search-options {
+  position: fixed;
+  z-index: 10000;
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 4px;
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+  background: white;
+  color: #1f2937;
+  box-shadow: 0 6px 20px #0002;
+  font: 13px/1.4 system-ui, sans-serif;
+}
+.filter-search-options [role="option"] { padding: 7px 8px; border-radius: 3px; cursor: pointer; overflow-wrap: anywhere; }
+.filter-search-options [role="option"]:hover,
+.filter-search-options [role="option"].is-active { background: #dbeafe; }
+.filter-search-options [aria-selected="true"] { font-weight: 700; }
+.filter-search-options__empty { padding: 8px; color: #6b7280; }
 .filter-header select { width: 136px; }
 .filter-header select[data-filter-path="shared.taxonId"] { width: 152px; }
 .filter-header select[data-filter-path="charts.t2.season"] { width: 140px; }

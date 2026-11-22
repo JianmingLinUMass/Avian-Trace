@@ -1,3 +1,5 @@
+import { organizeHotspotFrequencies, recommendCountyItineraries } from "../frontend/visualizations/t4/itinerary-data.js";
+import { frequencyCoverage, requireFrequencyMetadata } from "./reporting-frequency.js";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,6 +21,56 @@ export function validateCandidateIds(ids) {
 
 export function createLocationQueries(connection) {
   return {
+    async tripMonthFrequency(countyCode, ids, month) {
+      validateCounty(countyCode);
+      if (ids !== null) validateCandidateIds(ids);
+      if (!Number.isInteger(month) || month < 1 || month > 12) throw invalid("Invalid trip month");
+      const query = async (sql, params = []) => ({
+        data: (await connection.runAndReadAll(sql, params)).getRowObjectsJson()
+      });
+      await requireFrequencyMetadata(query);
+      const { data: periods } = await query(`
+        SELECT c.year
+        FROM reporting_frequency_coverage c
+        WHERE c.complete AND c.year < $1 AND c.month BETWEEN 1 AND 12
+          AND EXISTS (SELECT 1 FROM reporting_frequency_build b
+                      WHERE b.complete AND c.year BETWEEN b.start_year AND b.end_year)
+        GROUP BY c.year HAVING COUNT(DISTINCT c.month) = 12
+        ORDER BY c.year DESC LIMIT 10
+      `, [new Date().getFullYear()]);
+      const referenceYears = periods.map(row => row.year).reverse();
+      if (referenceYears.length !== 10) {
+        throw Object.assign(new Error("The trip planner requires ten complete years of hotspot checklist data."), { status: 503 });
+      }
+      const years = referenceYears.map((_, index) => "$" + (index + 3)).join(",");
+      const idFilter = ids === null ? "" : "AND locality_id IN (" + ids.map((_, index) => "$" + (index + 13)).join(",") + ")";
+      const { data: rows } = await query(`
+        WITH candidates AS (
+          SELECT locality_id, locality_name FROM locations WHERE county_code = $1 ${idFilter}
+        ), eligible AS (
+          SELECT locality_id, SUM(complete_checklists) AS complete_checklists
+          FROM complete_checklists_hotspot_month
+          WHERE county_code = $1 AND month = $2 AND year IN (${years})
+            AND locality_id IN (SELECT locality_id FROM candidates)
+          GROUP BY locality_id
+        ), reports AS (
+          SELECT locality_id, taxon_id, SUM(reporting_checklists) AS reporting_checklists
+          FROM species_checklists_hotspot_month
+          WHERE county_code = $1 AND month = $2 AND year IN (${years})
+            AND locality_id IN (SELECT locality_id FROM eligible)
+          GROUP BY locality_id, taxon_id
+        )
+        SELECT c.locality_id, c.locality_name, d.complete_checklists, n.taxon_id, n.reporting_checklists
+        FROM candidates c
+        LEFT JOIN eligible d USING (locality_id)
+        LEFT JOIN reports n USING (locality_id)
+        ORDER BY lower(c.locality_name), c.locality_id, n.taxon_id
+      `, [countyCode, month, ...referenceYears, ...(ids ?? [])]);
+      if (ids !== null && new Set(rows.map(row => row.locality_id)).size !== ids.length) {
+        throw invalid("Invalid candidate: hotspot not present in the selected county summary");
+      }
+      return { referenceYears, rows };
+    },
     async search(countyCode, search = "", page = 1) {
       validateCounty(countyCode);
       if (typeof search !== "string" || search.length > 100 || !Number.isSafeInteger(page) || page < 1 || page > 1000000) throw invalid("Invalid location search or page");
@@ -27,6 +79,32 @@ export function createLocationQueries(connection) {
       const total = Number((await connection.runAndReadAll("SELECT COUNT(*) AS total FROM locations WHERE " + where, params)).getRowObjectsJson()[0].total);
       const locations = (await connection.runAndReadAll("SELECT locality_id,locality_name,species_richness FROM locations WHERE " + where + " ORDER BY lower(locality_name),locality_id LIMIT 50 OFFSET $3", [...params, (page - 1) * 50])).getRowObjectsJson();
       return { locations, total, page, pageSize: 50, startYear: 2012, endYear: 2025 };
+    },
+    async frequency(countyCode, ids, year) {
+      validateCounty(countyCode);
+      if (ids !== null) validateCandidateIds(ids);
+      const idFilter = ids === null ? "" : "AND l.locality_id IN (" + ids.map((_, index) => "$" + (index + 3)).join(",") + ")";
+      if (!Number.isInteger(year) || year < 2012 || year > 2025) {
+        throw invalid("Invalid reporting year");
+      }
+      const query = async (sql, params = []) => ({
+        data: (await connection.runAndReadAll(sql, params)).getRowObjectsJson()
+      });
+      if ((await frequencyCoverage(query, year, year)).length) {
+        throw Object.assign(new Error("Hotspot frequency is unavailable for the selected year."), { status: 503 });
+      }
+      const { data } = await query(`
+        SELECT l.locality_id, l.locality_name, d.complete_checklists, n.taxon_id, n.reporting_checklists
+        FROM locations l
+        LEFT JOIN complete_checklists_hotspot_year d
+          ON d.county_code = l.county_code AND d.locality_id = l.locality_id AND d.year = $2
+        LEFT JOIN species_checklists_hotspot_year n
+          ON n.county_code = d.county_code AND n.locality_id = d.locality_id AND n.year = d.year
+        WHERE l.county_code = $1 ${idFilter}
+        ORDER BY lower(l.locality_name), l.locality_id, n.taxon_id
+      `, [countyCode, year, ...(ids ?? [])]);
+      if (ids !== null && new Set(data.map(row => row.locality_id)).size !== ids.length) throw invalid("Invalid candidate: hotspot not present in the selected county summary");
+      return data;
     },
     async memberships(countyCode, ids) {
       validateCounty(countyCode);
@@ -75,6 +153,27 @@ export function registerLocationRoutes(app) {
     const county = String(req.query.countyCode ?? "");
     validateCounty(county);
     return (await queries()).search(county, String(req.query.search ?? ""), Number(req.query.page ?? 1));
+  }));
+  app.get("/api/hotspot-reporting-frequency", endpoint(async req => {
+    const county = String(req.query.countyCode ?? "");
+    const ids = String(req.query.locationIds ?? "").split(",");
+    validateCounty(county); validateCandidateIds(ids);
+    const location = await queries();
+    if (req.query.month !== undefined) return location.tripMonthFrequency(county, ids, Number(req.query.month));
+    return location.frequency(county, ids, Number(req.query.year));
+  }));
+  app.get("/api/county-itineraries", endpoint(async req => {
+    const county = String(req.query.countyCode ?? "");
+    validateCounty(county);
+    const location = await queries();
+    if (req.query.month !== undefined) {
+      const { referenceYears, rows } = await location.tripMonthFrequency(county, null, Number(req.query.month));
+      const plan = recommendCountyItineraries(organizeHotspotFrequencies(rows));
+      const selectedIds = new Set(plan.itineraries.at(-1)?.hotspots.map(hotspot => hotspot.id));
+      return { referenceYears, ...plan, speciesRows: rows.filter(row => selectedIds.has(row.locality_id)) };
+    }
+    const rows = await location.frequency(county, null, Number(req.query.year));
+    return recommendCountyItineraries(organizeHotspotFrequencies(rows));
   }));
   app.get("/api/hotspot-species", endpoint(async req => {
     const county = String(req.query.countyCode ?? "");

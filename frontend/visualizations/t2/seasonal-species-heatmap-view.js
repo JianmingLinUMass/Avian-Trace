@@ -1,4 +1,4 @@
-import { buildSpeciesHeatmap } from "./species-heatmap-data.js";
+import { buildFrequencyHeatmap } from "./species-heatmap-data.js";
 import { createSpeciesHeatmap } from "./species-heatmap.js";
 import { createVisualizationFrame } from "../../components/visualization-frame.js";
 
@@ -6,10 +6,10 @@ const HTML = `
 <p id="heatmap-status" role="status" aria-live="polite">Loading geographic options…</p>
       <h2 id="heatmap-title">Select a state</h2>
       <p id="heatmap-context"></p>
-      <div id="species-heatmap" data-plot aria-busy="true" tabindex="0" role="region" aria-label="Monthly observation totals. Scroll horizontally on narrow screens to see all months."></div>
+      <div id="species-heatmap" data-plot aria-busy="true" tabindex="0" role="region" aria-label="Monthly reporting frequency. Scroll horizontally on narrow screens to see all months."></div>
       <p id="coverage-note" aria-live="polite"></p>
-      <p class="species-heatmap-page__note">Cell values are observation totals aggregated across the selected years, not monthly averages. Darker blue means more records. Hover or focus a cell to inspect its species, month, and total.</p>
-      <p class="species-heatmap-page__note">Species are selected by total observation records across all twelve months before display sorting. A zero means no matching records in processed data; it does not establish that a species was absent. Shared single-species selections and the trends chart's season do not restrict this heatmap.</p>
+      <p class="species-heatmap-page__note">Each cell shows the share of complete checklists reporting that species. For each calendar month, counts are summed across the selected years before division. Hover or focus a cell to see the percentage and both counts.</p>
+      <p class="species-heatmap-page__note">Species are ranked by reporting frequency across the displayed months. A gray cell means no eligible complete checklists. The eBird Basic Dataset excludes checklists with no observations. Reporting frequency measures how often birds were reported.</p>
 <div id="heatmap-tooltip" class="species-heatmap__tooltip" role="tooltip" hidden></div>
 `;
 
@@ -17,7 +17,7 @@ export function mountSeasonalSpeciesHeatmap({ container: host, presentation = "s
   const frame = createVisualizationFrame({ container: host, html: HTML, presentation, className: "species-heatmap-page" });
   const { elements } = frame;
   let disposed = false;
-  const { loadSpeciesHeatmap } = data;
+  const { loadSpeciesReportingFrequency } = data;
 
   const status = elements["heatmap-status"];
   const container = elements["species-heatmap"];
@@ -29,7 +29,7 @@ export function mountSeasonalSpeciesHeatmap({ container: host, presentation = "s
 
   function renderCurrent() {
     const filters = store.getFilters("t2Heatmap");
-    const species = buildSpeciesHeatmap(rows, filters.sortOrder);
+    const species = buildFrequencyHeatmap(rows, filters.sortOrder);
     chart.render({ species, startYear: filters.startYear, endYear: filters.endYear });
     return species;
   }
@@ -57,28 +57,28 @@ export function mountSeasonalSpeciesHeatmap({ container: host, presentation = "s
         const regionCode = filters.countyCode || filters.stateCode;
         const regionLevel = filters.countyCode ? "county" : "state";
         const name = geography.find(row => row.region_code === regionCode)?.region_name || regionCode;
-        elements["heatmap-title"].textContent = "Top species in " + name;
-        elements["heatmap-context"].textContent = "Observation totals aggregated across " + filters.startYear + "–" + filters.endYear + " · all twelve months";
-        status.textContent = "Loading monthly observation totals…";
+        elements["heatmap-title"].textContent = presentation === "compact" ? "Seasonal frequency" : "Top species in " + name;
+        elements["heatmap-context"].textContent = "Complete checklist reporting frequency · " + filters.startYear + "–" + filters.endYear + " · all twelve months";
+        status.textContent = "Loading monthly reporting frequency…";
         container.setAttribute("aria-busy", "true");
         try {
-          const result = await loadSpeciesHeatmap(regionCode, regionLevel, filters.startYear, filters.endYear, filters.speciesCount);
+          const result = await loadSpeciesReportingFrequency(regionCode, regionLevel, filters.startYear, filters.endYear, filters.speciesCount);
           if (currentRequest !== requestId) return;
           if (result.unavailableYears.length) {
-            status.textContent = "Monthly totals are unavailable for the complete selected range.";
-            coverage.textContent = "Missing processed summaries for: " + result.unavailableYears.join(", ") + ". No partial totals or incomplete top-species ranking are shown.";
+            status.textContent = "Monthly frequency is unavailable for the complete selected range.";
+            coverage.textContent = "Missing processed summaries for: " + result.unavailableYears.join(", ") + ". ";
             return;
           }
           rows = result.rows;
           if (!rows.length) {
-            status.textContent = "No species observation records in the selected area and years.";
+            status.textContent = "No species reported on complete checklists in the selected area and years.";
             return;
           }
           const species = renderCurrent();
           status.textContent = "Showing " + species.length + " top species and all twelve months in " + name + ".";
-          coverage.textContent = species.some(item => item.cells.some(cell => cell.observationRecords === null))
-            ? "Some monthly totals are unavailable. Gray cells are not zero observations."
-            : "All selected years have processed summaries. Months with no matching records are zero.";
+          coverage.textContent = species.some(item => item.cells.some(cell => cell.frequency === null))
+            ? "Gray cells indicate months without eligible complete checklists."
+            : "0% means no reports of that species on eligible complete checklists.";
         } catch (error) {
           if (disposed) return;
           if (currentRequest === requestId) status.textContent = "Unable to load species heatmap: " + error.message + ". Change a filter to retry.";

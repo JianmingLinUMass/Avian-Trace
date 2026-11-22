@@ -42,7 +42,7 @@ export function createHolidayObservationsChart({ d3 = globalThis.d3, sizing = {}
   function render(model) {
     const {series,startYear,endYear}=model;
     const width=Math.max(compact ? 320 : 720, container.clientWidth);
-    const height = compact ? Math.max(150, container.clientHeight) : (sizing.height ?? 520);
+    const height = compact ? Math.max(110, container.clientHeight) : (sizing.height ?? 520);
     const margin=compact ? {left:72,right:16,top:34,bottom:34} : {left:100,right:32,top:60,bottom:60};
     current={...model,viewportWidth:container.clientWidth,viewportHeight:container.clientHeight};
     hideTooltip();
@@ -52,15 +52,15 @@ export function createHolidayObservationsChart({ d3 = globalThis.d3, sizing = {}
     const y=d3.scaleLinear().domain([0,max || 1]).nice().range([height-margin.bottom,margin.top]);
     const grid=svg.append("g").attr("class","holiday-patterns__grid").attr("aria-hidden","true")
       .attr("transform","translate("+margin.left+",0)")
-      .call(d3.axisLeft(y).ticks(6).tickSize(-(width-margin.left-margin.right)).tickFormat(""));
+      .call(d3.axisLeft(y).ticks(compact && height < 145 ? 3 : 6).tickSize(-(width-margin.left-margin.right)).tickFormat(""));
     grid.select(".domain").remove();
     svg.append("g").attr("class","holiday-patterns__axis").attr("aria-hidden","true")
       .attr("transform","translate(0,"+(height-margin.bottom)+")")
       .call(d3.axisBottom(x).tickValues(series.filter((point,index)=>!compact||index%Math.max(1,Math.ceil(series.length/Math.max(2,Math.floor((width-margin.left-margin.right)/75))))===0||index===series.length-1).map(point=>point.year)).tickFormat(d3.format("d")));
     svg.append("g").attr("class","holiday-patterns__axis").attr("aria-hidden","true")
       .attr("transform","translate("+margin.left+",0)")
-      .call(d3.axisLeft(y).ticks(6).tickFormat(d3.format(".3~g")));
-    svg.append("text").attr("x",margin.left+(width-margin.left-margin.right)/2).attr("y",height-14).attr("text-anchor","middle").text("Year");
+      .call(d3.axisLeft(y).ticks(compact && height < 145 ? 3 : 6).tickFormat(d3.format(".3~g")));
+    svg.append("text").attr("x",margin.left+(width-margin.left-margin.right)/2).attr("y",height-(compact?5:14)).attr("text-anchor","middle").text("Year");
     svg.append("text").attr("transform","rotate(-90)").attr("x",-(margin.top+height-margin.bottom)/2)
       .attr("y",20).attr("text-anchor","middle").text(compact ? "Records per day" : "Average daily observation records");
     SERIES.forEach((item,index)=>{

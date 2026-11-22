@@ -1,3 +1,5 @@
+import { queryMonthlyFrequency } from "./reporting-frequency.js";
+import { query } from "./database.js";
 import { registerLocationRoutes } from "./location-queries.js";
 import { getHolidayObservations } from "./holiday-observations.js";
 import express from "express";
@@ -79,6 +81,7 @@ function endpoint(handler) {
       const result = await handler(req, filters);
       res.json(result);
     } catch (error) {
+      if (error.status === 503) return res.status(503).json({ error: error.message });
       if (error.message.startsWith("Invalid") ||
           error.message.startsWith("Limit") ||
           error.message.startsWith("Missing")) {
@@ -147,6 +150,11 @@ app.get("/api/county-richness", endpoint((req, filters) => {
   if (!/^US-[A-Z]{2}$/.test(filters.stateCode)) throw new Error("Invalid state code");
   return getCountyRichness(filters.stateCode, filters.startYear, filters.endYear);
 }));
+
+app.get("/api/species-reporting-frequency", endpoint((req, filters) => queryMonthlyFrequency(
+  query, filters.regionCode, filters.regionLevel, filters.startYear, filters.endYear,
+  Number(req.query.speciesCount ?? 15)
+)));
 
 app.get("/api/species-heatmap", endpoint((req, filters) => getSpeciesHeatmap(
   filters.regionCode, filters.regionLevel, filters.startYear, filters.endYear,

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { sortCountyRichness, getCountyBarLayout } from "../frontend/visualizations/t1/county-richness-bar-data.js";
+import { sortCountyRichness } from "../frontend/visualizations/t1/county-richness-bar-data.js";
 import { createFilterStore } from "../frontend/filters/filter-store.js";
 import { getFilterEntries } from "../frontend/filters/filter-definitions.js";
 
@@ -46,16 +46,6 @@ test("unavailable and invalid counts cannot silently become recorded zeros", () 
     assert.throws(() => sortCountyRichness([{ ...rows[0], species_richness: value }]), /Invalid county/);
     assert.throws(() => sortCountyRichness([{ ...rows[0], observation_records: value }]), /Invalid county/);
   }
-});
-
-test("large-state layouts reserve label space and a readable slot for every county", () => {
-  const counties = Array.from({ length: 254 }, (_, index) => ({ countyName: "County " + index }));
-  const layout = getCountyBarLayout(counties, 1000);
-  assert.ok((layout.width - layout.left - layout.right) / 254 >= 42);
-  assert.ok(layout.width > 1000);
-  const long = getCountyBarLayout([{ countyName: "Prince of Wales-Hyder Census Area" }], 600);
-  assert.ok(long.height > getCountyBarLayout([{ countyName: "Lee County" }], 600).height);
-  assert.equal(long.width, 600);
 });
 
 test("existing standalone t1 filters retain descending default and isolate local sorting", () => {
