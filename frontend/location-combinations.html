@@ -3,24 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Avian Trace — Hotspot Combination Species Coverage</title>
+  <title>Avian Trace — Birding Itinerary Planner</title>
   <link rel="stylesheet" href="components/filter-header.css">
-  <link rel="stylesheet" href="visualizations/t4/location-combinations.css">
   <link rel="stylesheet" href="styles/standalone.css">
-    <link rel="stylesheet" href="components/visualization-frame.css">
-    <link rel="stylesheet" href="visualizations/t4/hotspot-common.css">
+  <link rel="stylesheet" href="components/visualization-frame.css">
   <link rel="stylesheet" href="components/hotspot-picker.css">
+  <link rel="stylesheet" href="visualizations/t4/hotspot-frequency.css">
 </head>
-<body class="location-combinations-page">
-<main>
-  <h1>Hotspot Combination Species Coverage</h1>
-  <p>Compare distinct species recorded across combinations of exactly 3, 4, or 5 selected eBird hotspots. Coverage: 2012–2025.</p>
-  <aside class="access-notice"><strong>Access notice:</strong> eBird hotspot status does not guarantee public accessibility. Included hotspots may be private or restricted. Check current access rules and obtain any required permission before visiting.</aside>
-  <div id="filters" aria-label="Hotspot combination filters"></div>
-      <div id="visualization"><p role="status">Loading geographic options…</p></div>
-    </main>
-
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script type="module" src="pages/location-combinations.js"></script>
+<body class="location-combinations-page hotspot-frequency-page">
+  <main>
+    <h1>Birding Itinerary Planner</h1>
+    <div id="filters" aria-label="Itinerary filters"></div>
+    <div id="visualization"><p role="status">Loading filters…</p></div>
+  </main>
+  <script type="module" src="pages/location-combinations.js"></script>
 </body>
 </html>

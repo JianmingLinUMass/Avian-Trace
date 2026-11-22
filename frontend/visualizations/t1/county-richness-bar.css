@@ -2,21 +2,48 @@
 .county-bars-page h2 { margin-bottom: 8px; font-size: 20px; }
 .county-bars-page p { line-height: 1.5; }
 .county-bars-page__note, [data-role="scroll-hint"] { color: #4b5563; font-size: 14px; }
-.county-bars-page__x-label { text-align: center; font-weight: 600; margin-top: 4px; }
 [data-role="richness-chart"] { border: 1px solid #d1d5db; border-radius: 6px; background: white; }
-.county-bars__layout { display: grid; grid-template-columns: 84px minmax(0, 1fr); }
-.county-bars__viewport { min-width: 0; overflow-x: auto; }
+.county-bars__layout { min-height: 0; }
+.county-bars__viewport {
+  min-width: 0;
+  max-height: 580px;
+  overflow: auto;
+  font: 12px/1.3 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.visualization-view[data-presentation="compact"] .county-bars__viewport { height: 100%; max-height: none; }
 .county-bars__viewport:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; }
-.county-bars__plot, .county-bars__y-axis { display: block; font: 12px system-ui, sans-serif; }
-.county-bars__plot { max-width: none; }
-.county-bars__y-axis { background: white; }
-.county-bars__y-axis text { font: 12px system-ui, sans-serif; }
-.county-bars__x-axis text { font: 12px system-ui, sans-serif; }
-.county-bars__grid line { stroke: #e5e7eb; }
-.county-bars__county { cursor: pointer; }
-.county-bars__county.is-selected .county-bars__bar { stroke: #111827; stroke-width: 2; }
-.county-bars__county:focus { outline: none; }
-.county-bars__county:focus-visible .county-bars__hit-target { stroke: #c2410c; stroke-width: 2; }
-.county-bars__zero-marker { stroke: #93c5fd; stroke-width: 2; }
-.county-bars__county.is-selected .county-bars__zero-marker { stroke: #2563eb; }
+.county-bars__header, .county-bars__county {
+  display: grid;
+  grid-template-columns: minmax(0, 37%) minmax(0, 1fr) 3.4em;
+  align-items: center;
+  column-gap: clamp(6px, 1.1vw, 14px);
+  box-sizing: border-box;
+  width: 100%;
+  padding: 5px 10px;
+  text-align: left;
+}
+.county-bars__header { position: sticky; z-index: 1; top: 0; background: white; color: #486257; border-bottom: 1px solid #d4e0d7; font-weight: 600; }
+.county-bars__header[hidden] { display: none; }
+.county-bars__x-axis { height: 15px; position: relative; font-size: 10px; }
+.county-bars__x-axis span { position: absolute; transform: translateX(-50%); }
+.county-bars__unit, .county-bars__value { text-align: right; }
+.county-bars__county {
+  min-height: 27px;
+  border: 0;
+  border-bottom: 1px solid #e5ece6;
+  background: transparent;
+  color: #263a33;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.visualization-view[data-presentation="compact"] .county-bars__county { min-height: 24px; padding: 3px 10px; }
+.county-bars__name { white-space: normal; overflow-wrap: anywhere; }
+.county-bars__county:hover { background: #f3f7f3; }
+.county-bars__county.is-selected { background: #eaf2fb; box-shadow: inset 3px 0 #2563eb; font-weight: 650; }
+.county-bars__county:focus-visible { outline: 2px solid #2563eb; outline-offset: -2px; }
+.county-bars__track { height: 10px; background: #edf2ee; border-radius: 2px; }
+.county-bars__bar { display: block; height: 100%; border-radius: inherit; }
+.county-bars__bar--zero { border-left: 2px solid #93c5fd; }
 .county-bars__tooltip { position: fixed; z-index: 10; box-sizing: border-box; width: max-content; max-width: min(280px, calc(100vw - 32px)); padding: 10px 12px; border-radius: 5px; background: #111827; color: white; font: 14px/1.5 system-ui, sans-serif; pointer-events: none; }

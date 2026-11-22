@@ -57,14 +57,19 @@ export function createCountyChoropleth({ d3 = globalThis.d3, sizing = {}, presen
 
   function render({ counties, selectedCounty, stateName }) {
     current = { counties, selectedCounty, stateName };
-    if (compact) { width = Math.max(240,container.clientWidth); height = Math.max(100,container.clientHeight-56); svg.attr("viewBox",[0,0,width,height]); }
+    if (compact) {
+      width = Math.max(240, svg.node().clientWidth);
+      height = Math.max(40, svg.node().clientHeight);
+      svg.attr("viewBox", [0, 0, width, height]);
+    }
     hideTooltip();
     const maxRichness = Math.max(1, d3.max(counties.features, feature => feature.properties.speciesRichness) || 0);
     const color = d3.scaleSequential(d3.interpolateBlues).domain([0, maxRichness]);
     // Fit the existing county geometry, centering the projection on the selected state.
     const [longitude, latitude] = d3.geoCentroid(counties);
+    const padding = compact ? Math.min(12, height * 0.1) : 18;
     const projection = d3.geoAlbers().rotate([-longitude, 0]).center([0, latitude])
-      .fitExtent([[18, 18], [width - 18, height - 18]], counties);
+      .fitExtent([[padding, padding], [width - padding, height - padding]], counties);
     const path = d3.geoPath().projection(projection);
     polygons.selectAll(".county")
       .data(counties.features, feature => feature.properties.regionCode)

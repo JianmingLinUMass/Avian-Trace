@@ -45,11 +45,12 @@ export const CHART_FILTER_DEFINITIONS = freeze({
     },
     sortOrder: {
       label: "Sort", type: "enum", control: "select", default: "total",
-      options: [{ value: "total", label: "Total observations" }, { value: "alpha", label: "Alphabetical" }]
+      options: [{ value: "total", label: "Frequency" }, { value: "alpha", label: "Alphabetical" }]
     }
   },
   t3: {},
   t4UpSet: {},
+  t4Frequency: {},
   t4: {
     candidateLocationIds: { label: "Candidate hotspots", maxItems: 10, type: "locationIds", control: null, default: [] },
     selectedCombinationIds: { label: "Selected combination", maxItems: 5, type: "locationIds", control: null, default: [] },
@@ -83,6 +84,7 @@ export const TASK_DEFINITIONS = freeze({
     sharedFilters: ["stateCode", "countyCode", "taxonId", "startYear", "endYear"],
     filterRoles: { stateCode: "countyContext", countyCode: "selection" }
   },
+  t4Frequency: { label: "Birding Itinerary", sharedFilters: ["stateCode", "countyCode"] },
   t4UpSet: { label: "Hotspot Species Overlap", sharedFilters: ["stateCode", "countyCode"] },
   t4: { label: "Multi-Location Species Coverage", sharedFilters: ["stateCode", "countyCode"] }
 });

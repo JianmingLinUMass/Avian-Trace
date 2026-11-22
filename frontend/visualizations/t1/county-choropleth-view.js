@@ -81,7 +81,7 @@ const period = { startYear: 2012, endYear: 2025 };
           return;
         }
         const stateName = states.find(row => row.region_code === filters.stateCode).region_name;
-        elements["map-title"].textContent = stateName + " · 2012–2025";
+        elements["map-title"].textContent = presentation === "compact" ? "County richness map · " + stateName : stateName + " · 2012–2025";
         status.textContent = "Loading all counties in " + stateName + "…";
         mapContainer.setAttribute("aria-busy", "true");
         try {

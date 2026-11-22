@@ -44,7 +44,7 @@ const container = elements["holiday-chart"];
           return;
         }
         const name = geography.find(row => row.region_code === filters.countyCode)?.region_name || filters.countyCode;
-        elements["holiday-title"].textContent = (taxa.get(filters.taxonId) || filters.taxonId) + " in " + name;
+        elements["holiday-title"].textContent = presentation === "compact" ? "Holiday comparison · " + (taxa.get(filters.taxonId) || filters.taxonId) : (taxa.get(filters.taxonId) || filters.taxonId) + " in " + name;
         elements["holiday-context"].textContent = name + " · " + filters.startYear + "–" + filters.endYear + " · actual holidays versus all other dates";
         status.textContent = "Loading daily observation averages…";
         container.setAttribute("aria-busy", "true");

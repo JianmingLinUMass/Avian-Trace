@@ -20,6 +20,8 @@ parquet_ma/
 *.gzidx
 
 # Databases
+database_ma/
+database/*.zip
 database/*.duckdb
 database/*.duckdb.wal
 database/*.sqlite

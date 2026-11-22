@@ -5,16 +5,15 @@ import { createVisualizationFrame } from "../../components/visualization-frame.j
 const HTML = `
 <p id="chart-status" role="status" aria-live="polite">Loading geographic options…</p>
       <h2 id="chart-title">Select a state</h2>
-      <p id="scroll-hint">County labels are shown in full. Scroll the chart horizontally when needed; the Y-axis stays visible.</p>
+      <p id="scroll-hint">County labels are shown in full. Scroll down to see more counties. The species scale stays visible.</p>
       <div id="richness-chart" data-plot aria-busy="true"></div>
-      <p class="county-bars-page__x-label">County</p>
       <p id="county-selection" aria-live="polite">No county highlighted.</p>
-      <p class="county-bars-page__note">Choose a county in the header, click its bar, or focus its column and press Enter or Space to highlight it. All counties remain in the statewide comparison. Selected counties are brought into view. Choose “Select county” to clear the highlight.</p>
+      <p class="county-bars-page__note">Choose a county in the header, click its bar, or focus its row and press Enter or Space to highlight it. All counties remain in the statewide comparison. Selected counties are brought into view. Choose “Select county” to clear the highlight.</p>
       <p class="county-bars-page__note">Richness counts each species once across 2012–2025. Observation counts are species-category observation records, not individual birds, checklists, or population estimates. All counties returned by the data endpoint are included, whether or not map boundaries are available.</p>
 <div id="bar-tooltip" class="county-bars__tooltip" role="tooltip" hidden></div>
 `;
 
-export function mountCountyRichnessBar({ container: host, presentation = "standalone", store, data, geography, taxa, d3 = globalThis.d3, sizing = {} }) {
+export function mountCountyRichnessBar({ container: host, presentation = "standalone", store, data, geography, taxa, d3 = globalThis.d3 }) {
   const frame = createVisualizationFrame({ container: host, html: HTML, presentation, className: "county-bars-page" });
   const { elements } = frame;
   let disposed = false;
@@ -46,7 +45,7 @@ export function mountCountyRichnessBar({ container: host, presentation = "standa
   async function initialize() {
     try {
       const states = geography.filter(row => row.region_level === "state");
-      chart = createCountyRichnessBarChart({ d3, sizing, presentation,
+      chart = createCountyRichnessBarChart({ d3,
         container,
         tooltip: elements["bar-tooltip"],
         onCountySelect: countyCode => store.setShared({ countyCode })
@@ -74,7 +73,7 @@ export function mountCountyRichnessBar({ container: host, presentation = "standa
           return;
         }
         const stateName = states.find(row => row.region_code === filters.stateCode)?.region_name || filters.stateCode;
-        elements["chart-title"].textContent = stateName + " · 2012–2025";
+        elements["chart-title"].textContent = presentation === "compact" ? "County richness ranking · " + stateName : stateName + " · 2012–2025";
         status.textContent = "Loading all counties in " + stateName + "…";
         container.setAttribute("aria-busy", "true");
         try {

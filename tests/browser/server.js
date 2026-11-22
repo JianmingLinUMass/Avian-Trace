@@ -10,6 +10,6 @@ app.use("/api",async(req,res)=>{
 });
 app.get("/view-lifecycle.html",(req,res)=>res.sendFile(path.join(root,"tests/browser/view-lifecycle.html")));
 app.get("/view-lifecycle.js",(req,res)=>res.sendFile(path.join(root,"tests/browser/view-lifecycle.js")));
-for (const name of ["compact-cases.js","compact-preview.html","compact-preview.js","compact-regression.html","compact-regression.js","dashboard-regression.html","dashboard-regression.js"]) app.get("/"+name,(req,res)=>res.sendFile(path.join(root,"tests/browser",name)));
+for (const name of ["searchable-filters.html","searchable-filters.js","compact-cases.js","compact-preview.html","compact-preview.js","compact-regression.html","compact-regression.js","dashboard-regression.html","dashboard-regression.js"]) app.get("/"+name,(req,res)=>res.sendFile(path.join(root,"tests/browser",name)));
 app.use(express.static(path.join(root,"frontend")));
 app.listen(3001,"127.0.0.1",()=>console.log("Lifecycle regression fixture: http://127.0.0.1:3001/view-lifecycle.html"));

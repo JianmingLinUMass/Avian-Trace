@@ -6,14 +6,15 @@ CS571 Data Visualization project exploring bird observation patterns across the 
 
 **[Download Project Data — Google Drive](https://drive.google.com/drive/folders/1dYRLeSEYjXCO4iDgs1_9ARdvllL0kgPN?usp=drive_link)**
 
-Download the `database/` and `parquet/` folders and place them in the project root.
+For the Massachusetts demo, download the latest `database.zip` from the **MA** folder and extract its three DuckDB files into `database/` at the project root. The dashboard reads the prepared databases. Parquet is only needed to rebuild summaries.
 
-The project uses two DuckDB databases:
+The project uses three DuckDB databases:
 
 | Database             | Purpose                                                                      |
 | -------------------- | ---------------------------------------------------------------------------- |
 | `ebird.duckdb`       | Species, geography, annual and monthly observation trends                    |
 | `ebird_daily.duckdb` | Holiday dates, annual average daily bird counts, and holiday-specific counts |
+| `ebird_locations.duckdb` | Hotspot catalog and annual checklist reporting frequency |
 
 ## 🚀 Quick Start
 
@@ -24,7 +25,7 @@ npm install
 npm start
 ```
 
-The server runs at http://127.0.0.1:3000.
+The server runs at http://127.0.0.1:3000. Open the [Dashboard](http://127.0.0.1:3000/dashboard.html) for monthly species frequency and ranked birding itineraries.
 
 To run on another port: do 
 

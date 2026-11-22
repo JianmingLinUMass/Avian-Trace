@@ -48,7 +48,7 @@ const container = elements["trend-chart"];
         const regionCode = filters.countyCode || filters.stateCode;
         const regionName = geography.find(row => row.region_code === regionCode)?.region_name || regionCode;
         const speciesName = taxa.get(filters.taxonId) || filters.taxonId;
-        elements["trend-title"].textContent = speciesName + " in " + regionName;
+        elements["trend-title"].textContent = presentation === "compact" ? "Annual reports · " + speciesName : speciesName + " in " + regionName;
         elements["trend-context"].textContent = regionName + " · " + filters.startYear + "–" + filters.endYear + " · " + "All five seasonal trends";
         status.textContent = "Loading yearly observation records…";
         container.setAttribute("aria-busy", "true");
