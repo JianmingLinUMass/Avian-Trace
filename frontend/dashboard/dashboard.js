@@ -34,12 +34,12 @@ export function mountDashboard({ container, store, data, geography, taxa, d3, to
         <section class="dashboard-panel" data-panel="map" aria-label="T1 County Choropleth"></section>
         <section class="dashboard-panel" data-panel="bars" aria-label="T1 County Richness Bar Chart"></section>
       </div>
-      <div class="dashboard-row dashboard-row--trends">
+      <div class="dashboard-row dashboard-row--temporal">
+        <section class="dashboard-panel" data-panel="analysis" aria-label="T2 Seasonal Species Heatmap"></section>
         <section class="dashboard-panel" data-panel="trends" aria-label="T2 Observation Trends"></section>
         <section class="dashboard-panel" data-panel="holiday" aria-label="T3 Holiday Observation Patterns"></section>
       </div>
-      <div class="dashboard-row dashboard-row--coverage">
-        <section class="dashboard-panel" data-panel="analysis" aria-label="Seasonal species analysis"></section>
+      <div class="dashboard-row dashboard-row--hotspot">
         <section class="dashboard-panel" data-panel="hotspots" aria-label="T4 Birding Itinerary Planner"></section>
       </div>
     </div>`;
