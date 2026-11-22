@@ -36,11 +36,17 @@ export function mountCountyRichnessBar({ container: host, presentation = "standa
       : "No county highlighted.";
   }
 
-  function renderCurrent() {
+  function renderCurrent(animation = "none") {
     const filters = store.getFilters("t1");
-    chart.render({ rows: sortCountyRichness(displayedRows, filters.sortOrder), selectedCounty: filters.countyCode });
+
+    chart.render({
+      rows: sortCountyRichness(displayedRows, filters.sortOrder),
+      selectedCounty: filters.countyCode,
+      animation
+    });
+
     updateHighlight(filters.countyCode);
-  }
+}
 
   async function initialize() {
     try {
@@ -59,7 +65,7 @@ export function mountCountyRichnessBar({ container: host, presentation = "standa
           return;
         }
         if (changedKeys.length && changedKeys.every(key => key === "charts.t1.sortOrder")) {
-          if (displayedRows.length) renderCurrent();
+          if (displayedRows.length) renderCurrent("sort");
           return;
         }
         const currentRequest = ++requestId;
@@ -84,7 +90,7 @@ export function mountCountyRichnessBar({ container: host, presentation = "standa
           }
           if (currentRequest !== requestId) return;
           displayedRows = rows;
-          renderCurrent();
+          renderCurrent("state-change");
           status.textContent = rows.length
             ? "Showing all " + rows.length + " counties in " + stateName + ". Sort or select a county without removing others."
             : "No county summaries available for " + stateName + ".";
