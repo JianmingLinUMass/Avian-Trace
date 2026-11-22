@@ -21,7 +21,7 @@ export function mountCountyChoropleth({ container: host, presentation = "standal
   resetButton.type = "button";
   resetButton.textContent = "Reset";
   resetButton.addEventListener("click", () => chart?.resetZoom());
-  frame.controls.append(resetButton);
+  if (frame.controls) frame.controls.append(resetButton);
 
   const { elements } = frame;
   let disposed = false;

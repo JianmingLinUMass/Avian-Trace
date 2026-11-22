@@ -106,3 +106,24 @@ test("both contexts read identical store defaults for the six tasks", () => {
   }
   assert.deepEqual(store.getYearBounds(), { min: 2012, max: 2025 });
 });
+
+test("view modules never dereference the compact-only controls slot outside a guard", async () => {
+  // Regression: county-choropleth-view appended a Reset button to frame.controls
+  // unconditionally, which is undefined in standalone presentation and crashed
+  // county-choropleth.html during mount ("reading 'append'").
+  const viewDirectory = "frontend/visualizations";
+  const sources = [
+    "t1/county-choropleth-view.js", "t1/county-richness-bar-view.js",
+    "t2/observation-trends-view.js", "t2/seasonal-species-heatmap-view.js",
+    "t3/holiday-observation-patterns-view.js",
+    "t4/hotspot-frequency-view.js", "t4/location-combinations-view.js", "t4/hotspot-species-overlap-view.js"
+  ];
+  for (const file of sources) {
+    const source = await readFile(url("../" + viewDirectory + "/" + file), "utf8");
+    const unguarded = source
+      .split(/\r?\n/)
+      .filter(line => /frame\.controls\./.test(line))
+      .filter(line => !/if \(frame\.controls\)[^.]*frame\.controls\./.test(line));
+    assert.deepEqual(unguarded, [], file + " must guard every frame.controls dereference (controls is undefined in standalone presentation)");
+  }
+});
