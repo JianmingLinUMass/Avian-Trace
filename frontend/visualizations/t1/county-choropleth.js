@@ -11,6 +11,19 @@ export function createCountyChoropleth({ d3 = globalThis.d3, sizing = {}, presen
     .attr("role", "group")
     .attr("aria-label", "County species richness map. Select a county by clicking or pressing Enter or Space.");
   const polygons = svg.append("g");
+  const zoom = d3.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", (event) => {
+      polygons.attr("transform", event.transform);
+    });
+  svg.call(zoom);
+
+  function resetZoom() {
+    svg.transition()
+      .duration(250)
+      .call(zoom.transform, d3.zoomIdentity);
+  }
+
   const legend = root.append("svg")
     .attr("class", "county-choropleth__legend")
     .attr("viewBox", [0, 0, 480, compact ? 60 : 76])
@@ -117,7 +130,19 @@ export function createCountyChoropleth({ d3 = globalThis.d3, sizing = {}, presen
   return {
     render,
     setSelectedCounty,
-    clear() { current = null; hideTooltip(); polygons.selectAll("*").remove(); legend.selectAll("*").remove(); },
-    destroy() { resize?.disconnect(); current = null; hideTooltip(); svg.remove(); legend.remove(); }
+    resetZoom,
+    clear() {
+      current = null;
+      hideTooltip();
+      polygons.selectAll("*").remove();
+      legend.selectAll("*").remove();
+    },
+    destroy() {
+      resize?.disconnect();
+      current = null;
+      hideTooltip();
+      svg.remove();
+      legend.remove();
+    }
   };
 }
