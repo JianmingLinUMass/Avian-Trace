@@ -1,5 +1,29 @@
 # Visualization Design
 
+## Standalone Visualization URLs
+
+Start the application from the repository root:
+
+~~~sh
+npm start
+~~~
+
+[Avian Trace dashboard](http://127.0.0.1:3000/dashboard.html)
+
+The Express server serves the following implemented pages at http://127.0.0.1:3000.
+Future visualization URLs will be added only when their pages are implemented.
+
+| Task | Visualization | URL | Implementation status | Implementation commit |
+| --- | --- | --- | --- | --- |
+| Infrastructure | Filter demo | [Filter demo](http://127.0.0.1:3000/filter-demo.html) | Implemented | `66afa35` |
+| T1 | County Choropleth | [County Choropleth](http://127.0.0.1:3000/county-choropleth.html) | Implemented | `e2492ab` |
+| T1 | County Richness Bar Chart | [County Richness Bar Chart](http://127.0.0.1:3000/county-richness-bar.html) | Implemented | `d8f4a74` |
+| T2 | Observation Trends Line Chart | [Observation Trends](http://127.0.0.1:3000/observation-trends.html) | Implemented | `fe0bcbf` |
+| T2 | Seasonal Species Heatmap | [Seasonal Species Heatmap](http://127.0.0.1:3000/seasonal-species-heatmap.html) | Implemented | `5b2d7e4` |
+| T3 | Holiday Observation Patterns (comparison line chart) | [Holiday Observation Patterns](http://127.0.0.1:3000/holiday-observation-patterns.html) | Implemented | `b41a613` |
+| T4 | Birding Itinerary Planner | [Birding Itinerary Planner](http://127.0.0.1:3000/location-combinations.html) | Implemented | — |
+| T4 | Birding Itinerary Planner (legacy URL) | [Birding Itinerary Planner](http://127.0.0.1:3000/hotspot-species-overlap.html) | Implemented | — |
+
 ## Reporting-frequency preparation for T2 and T4
 
 A separate EBD-derived metric is prepared for 2012-2025:
@@ -325,28 +349,6 @@ Run `npm start`, then open the filter demo listed in the centralized URL table b
 7. Change state: county clears and its options narrow to that state. Try a reversed year range: the store stays unchanged and the header displays an error.
 
 Switching the displayed task destroys the old header and creates the next one against the same store; state values persist and no filter-change notification is generated merely by switching controls. This is a notification demonstration, not a chart integration.
-
-## Standalone Visualization URLs
-
-Start the application from the repository root:
-
-~~~sh
-npm start
-~~~
-
-The Express server serves the following implemented pages at http://127.0.0.1:3000.
-Future visualization URLs will be added only when their pages are implemented.
-
-| Task | Visualization | URL | Implementation status | Implementation commit |
-| --- | --- | --- | --- | --- |
-| Infrastructure | Filter demo | [Filter demo](http://127.0.0.1:3000/filter-demo.html) | Implemented | `66afa35` |
-| T1 | County Choropleth | [County Choropleth](http://127.0.0.1:3000/county-choropleth.html) | Implemented | `e2492ab` |
-| T1 | County Richness Bar Chart | [County Richness Bar Chart](http://127.0.0.1:3000/county-richness-bar.html) | Implemented | `d8f4a74` |
-| T2 | Observation Trends Line Chart | [Observation Trends](http://127.0.0.1:3000/observation-trends.html) | Implemented | `fe0bcbf` |
-| T2 | Seasonal Species Heatmap | [Seasonal Species Heatmap](http://127.0.0.1:3000/seasonal-species-heatmap.html) | Implemented | `5b2d7e4` |
-| T3 | Holiday Observation Patterns (comparison line chart) | [Holiday Observation Patterns](http://127.0.0.1:3000/holiday-observation-patterns.html) | Implemented | `b41a613` |
-| T4 | Birding Itinerary Planner | [Birding Itinerary Planner](http://127.0.0.1:3000/location-combinations.html) | Implemented | — |
-| T4 | Birding Itinerary Planner (legacy URL) | [Birding Itinerary Planner](http://127.0.0.1:3000/hotspot-species-overlap.html) | Implemented | — |
 
 ### T1 — County Choropleth
 
