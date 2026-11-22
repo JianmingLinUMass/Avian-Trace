@@ -195,6 +195,23 @@ async function testFrequencyAndItineraries() {
     await until(() => find('[data-role="frequency-status"]').textContent.includes("June · 2016–2025") && find('[data-role="frequency-plot"]').getAttribute("aria-busy") === "false");
     assert(hotspotRows()[0].querySelector(".itinerary-bars__value").textContent === "26.98", "June failed to use its own monthly summaries");
 
+    // Zero-combination disclosure: candidates lacking complete checklists for the
+    // trip month must be explained, not left as a silently blank chart.
+    stops.value = "3";
+    stops.dispatchEvent(new Event("change"));
+    tripMonth.value = "11";
+    tripMonth.dispatchEvent(new Event("change"));
+    store.setChart("t4", { candidateLocationIds: ["L28385444", "L25930412", "L1823657"] });
+    await until(() => find('[data-role="frequency-status"]').textContent.includes("November") && find('[data-role="frequency-plot"]').getAttribute("aria-busy") === "false");
+    assert(find('[data-role="frequency-status"]').textContent.includes("Only 1 of the selected hotspots") &&
+      find('[data-role="frequency-status"]').textContent.includes("fewer than 3 stops"),
+      "Zero-combination status must attribute the stop-count cause");
+    assert(find(".itinerary-note").textContent.includes("Aberjona Nature Trail") &&
+      find(".itinerary-note").textContent.includes("Arlington Boys and Girls Club"),
+      "Candidates without complete checklists must be named");
+    assert(hotspotRows().length === 0 && !find(".itinerary-stop-list"),
+      "No combinations means no bars and no stale itinerary details");
+
     find('.county[data-county-code="US-MA-025"]').dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     assert(store.getState().shared.countyCode === "US-MA-025", "Selecting the map did not update the county");
     assert(find('[data-search-for="shared.countyCode"]').value === "Suffolk County", "County search did not synchronize");

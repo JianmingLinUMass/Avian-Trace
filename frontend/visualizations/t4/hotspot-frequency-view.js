@@ -67,8 +67,25 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     const selected = countyPlan ? plans[stops - 1] : plans.find(itinerary => itinerary.key === previewKey) ?? plans[0];
     plot.replaceChildren();
     detailsHost.replaceChildren();
+    const exclusionNote = () => {
+      if (!excluded.length && !(countyPlan && countyPlan.totalHotspots > eligible)) return null;
+      const note = document.createElement("p");
+      note.className = "itinerary-note";
+      note.textContent = excluded.length
+        ? "No complete checklists for " + month + ": " + excluded.map(hotspot => hotspot.name).join(", ") + "."
+        : number.format(countyPlan.totalHotspots - eligible) + " county hotspots had no complete checklists for this period.";
+      return note;
+    };
     if (!selected) {
-      status.textContent = eligible + " hotspots have data for " + period + ". Choose fewer stops or another month.";
+      status.textContent = eligible === 0
+        ? countyPlan
+          ? "No county hotspots have complete checklists for " + period + ". Try another month."
+          : "No complete checklists for " + month + " at the selected hotspots. Try another month or different hotspots."
+        : countyPlan
+          ? "Only " + number.format(eligible) + " county hotspots have data for " + period + ", fewer than " + stops + " stops. Choose fewer stops or another month."
+          : "Only " + eligible + " of the selected hotspots have data for " + period + ", fewer than " + stops + " stops. Choose fewer stops or another month.";
+      const note = exclusionNote();
+      if (note) detailsHost.append(note);
       return;
     }
     status.textContent = countyPlan
@@ -88,14 +105,8 @@ export function mountHotspotFrequency({ container, store, data, taxa = new Map()
     details.className = "itinerary-result-details";
     details.setAttribute("aria-label", "Itinerary details");
     details.append(renderItineraryStops(document, selected));
-    if (excluded.length || (countyPlan && countyPlan.totalHotspots > eligible)) {
-      const note = document.createElement("p");
-      note.className = "itinerary-note";
-      note.textContent = excluded.length
-        ? "No complete checklists for " + month + ": " + excluded.map(hotspot => hotspot.name).join(", ") + "."
-        : number.format(countyPlan.totalHotspots - eligible) + " county hotspots had no complete checklists for this period.";
-      details.append(note);
-    }
+    const note = exclusionNote();
+    if (note) details.append(note);
     const speciesHotspots = countyPlan ? selected.hotspots.map(hotspot => countySpecies.get(hotspot.id)) : selected.hotspots;
     details.append(createItinerarySpeciesPanel(document, speciesHotspots, taxa, period, speciesQuery, query => { speciesQuery = query; }));
     detailsHost.append(details);
