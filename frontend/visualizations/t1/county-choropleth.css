@@ -11,3 +11,4 @@
 .county-choropleth__map .county.is-selected { stroke: #111827; stroke-width: 3; }
 .county-choropleth__map .county:focus-visible { outline: none; stroke: #c2410c; stroke-width: 4; }
 .county-choropleth__tooltip { position: fixed; z-index: 10; box-sizing: border-box; width: max-content; max-width: min(280px, calc(100vw - 32px)); padding: 10px 12px; border-radius: 5px; background: #111827; color: white; font: 14px/1.5 system-ui, sans-serif; pointer-events: none; }
+.county-choropleth__map .county:focus { outline: none; }
