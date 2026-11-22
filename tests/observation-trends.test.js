@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { DuckDBInstance } from "@duckdb/node-api";
 import { SEASONAL_SPECIES_TREND_SQL, getTrendMonths, validateSeasonalTrend } from "../backend/species-trend-query.js";
-import { buildYearlyTrendSeries } from "../frontend/visualizations/t2/observation-trends-data.js";
+import { buildYearlyTrendSeries, loadSeasonalTrendSeries, TREND_DEFINITIONS } from "../frontend/visualizations/t2/observation-trends-data.js";
 import { createFilterStore } from "../frontend/filters/filter-store.js";
 import { getFilterEntries } from "../frontend/filters/filter-definitions.js";
 
@@ -115,4 +115,25 @@ test("T2 standalone filters retain single species and isolate season from other 
   assert.equal(otherEvents.length,1);
   assert.equal(store.getFilters("t2").taxonId,"a");
   assert.throws(()=>store.setShared({taxonId:["a","b"]}),/Invalid/);
+});
+
+
+test("all five seasonal series use existing queries, permanent colors and independent gaps", async () => {
+  const calls = [];
+  const filters = { stateCode: "US-MA", countyCode: "US-MA-017", taxonId: "a", startYear: 2024, endYear: 2025, season: "winter" };
+  const trends = await loadSeasonalTrendSeries(async (...args) => {
+    calls.push(args);
+    return [{ year: 2024, observation_records: args[5] === "winter" ? "0" : "12", summary_available: true }];
+  }, filters);
+  assert.deepEqual(trends.map(trend => trend.id), ["all", "spring", "summer", "fall", "winter"]);
+  assert.deepEqual(trends.map(trend => trend.color), ["#E67E22", "#2E8B57", "#D4AC0D", "#D64545", "#3498DB"]);
+  assert.deepEqual(calls, TREND_DEFINITIONS.map(trend => ["US-MA-017", "county", "a", 2024, 2025, trend.id]));
+  assert.equal(trends[4].series[0].observationRecords, 0);
+  assert.ok(trends.every(trend => trend.series[1].observationRecords === null));
+  calls.length = 0;
+  await loadSeasonalTrendSeries(async (...args) => { calls.push(args); return []; }, { ...filters, countyCode: null });
+  assert.ok(calls.every(args => args[0] === "US-MA" && args[1] === "state"));
+  assert.deepEqual(await loadSeasonalTrendSeries(async () => [], filters), []);
+  await assert.rejects(loadSeasonalTrendSeries(async () => { throw new Error("Unavailable"); }, filters), /Unavailable/);
+  assert.equal(getFilterEntries({chartId: "t2"}).find(entry => entry.key === "season").definition.control, null);
 });

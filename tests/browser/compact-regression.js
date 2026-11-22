@@ -39,6 +39,47 @@ async function run(){
    assert(body.scrollHeight>body.clientHeight,"Heatmap does not scroll all twenty species");const top=months.getBoundingClientRect().top,bottom=legend.getBoundingClientRect().bottom;
    const legendBox=legend.getBoundingClientRect();assert([...legend.querySelectorAll("text")].every(text=>{const b=text.getBoundingClientRect();return b.top>=legendBox.top-1&&b.bottom<=legendBox.bottom+1;}),"Heatmap legend text clipped");body.scrollTop=body.scrollHeight;await settle();assert(months.getBoundingClientRect().top===top&&legend.getBoundingClientRect().bottom===bottom,"Heatmap header/legend moved with rows");
   }
+  if(item.id==="trends"){
+   const colors={all:"#E67E22",spring:"#2E8B57",summer:"#D4AC0D",fall:"#D64545",winter:"#3498DB"};
+   assert(view.root.querySelectorAll('.observation-trends__line').length===5,"Five trends missing");
+   assert(!view.root.querySelector('[data-filter-path="charts.t2.season"]'),"Season dropdown remains");
+   function checkSeason(selected){
+    assert(view.root.querySelectorAll('.observation-trends__legend-item[aria-pressed="true"]').length===1,"Multiple selected trends");
+    for(const [season,color] of Object.entries(colors)){
+     const group=view.root.querySelector('.observation-trends__series[data-season="'+season+'"]');
+     const line=group.querySelector('.observation-trends__line');
+     assert(line.getAttribute('stroke')===color,"Season lost its permanent color");
+     assert(group.getAttribute('opacity')===(season===selected?'1':'0.65'),"Incorrect season opacity");
+     assert(Number(line.getAttribute('stroke-width'))===(season===selected?3.5:2),"Incorrect emphasis");
+    }
+   }
+   function checkTrendLayout(){
+    const svg=view.root.querySelector('.observation-trends__plot'), box=svg.getBoundingClientRect();
+    const items=[...svg.querySelectorAll('.observation-trends__legend-item')];
+    assert(items.map(item=>item.dataset.season).join(',')==='all,spring,summer,fall,winter','Legend order changed');
+    const bounds=items.map(item=>item.getBoundingClientRect());
+    assert(bounds.every((rect,index)=>Math.abs(rect.left-bounds[0].left)<1&&(!index||rect.top>=bounds[index-1].bottom-1)),'Legend is not a vertical column');
+    assert(bounds.every(rect=>rect.left>=box.left&&rect.right<=box.right&&rect.top>=box.top&&rect.bottom<=box.bottom),'Legend clipped by chart panel');
+    assert([...svg.querySelectorAll('.observation-trends__point')].every(point=>point.getBoundingClientRect().right<bounds[0].left),'Legend obscures plotted points');
+    assert([...svg.querySelectorAll('.observation-trends__axis text,.observation-trends__axis-label')].every(text=>{const rect=text.getBoundingClientRect();return rect.left>=box.left-1&&rect.right<=bounds[0].left&&rect.top>=box.top-1&&rect.bottom<=box.bottom+1;}),'Axes or labels clipped or obscured by legend');
+   }
+   checkTrendLayout();
+   checkSeason('all');
+   for(const season of Object.keys(colors)){
+    view.root.querySelector('.observation-trends__legend-item[data-season="'+season+'"]').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    checkSeason(season);assert(store.getFilters('t2').season===season,"Legend did not synchronize state");
+    view.root.querySelector('.observation-trends__series[data-season="'+season+'"] .observation-trends__line').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    checkSeason(season);
+   }
+   const legend=view.root.querySelector('.observation-trends__legend-item[data-season="spring"]');
+   legend.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));checkSeason('spring');
+   legend.dispatchEvent(new KeyboardEvent('keydown',{key:' ',bubbles:true}));checkSeason('spring');
+   const before=card.getBoundingClientRect().height;
+   const details=[...view.root.querySelectorAll('button')].find(button=>button.textContent==='Details');
+   details.click();await settle();assert(document.querySelector('dialog[open]')?.textContent.includes('Winter selects January'),"Details lost seasonal calculation notes");
+   assert(card.getBoundingClientRect().height===before,"Details changed compact panel height");
+   document.querySelector('dialog[open] button').click();
+  }
   if(item.id==="bars"){
    store.setShared({stateCode:"US-TX"});await until(()=>view.root.querySelectorAll(item.selector).length===254);const scroll=view.root.querySelector('.county-bars__viewport');assert(scroll.scrollWidth>scroll.clientWidth,"Large county rankings do not scroll");
   }
@@ -53,6 +94,11 @@ async function run(){
   }
   card.style.width=Math.max(500,item.width-200)+"px";card.style.height=Math.max(220,item.height-40)+"px";await settle();await settle();assert(bounds(view.root,card),item.id+" did not resize");
   assert(![...view.root.querySelectorAll('path')].some(path=>/NaN|Infinity/.test(path.getAttribute('d')||'')),item.id+" generated invalid resized geometry");
+  if(item.id==="trends"){
+   const legend=view.root.querySelector('.observation-trends__legend').getBoundingClientRect(), plot=view.root.querySelector('svg').getBoundingClientRect();
+   assert(legend.right<=plot.right&&legend.bottom<=plot.bottom,'Resized legend escaped the chart');
+   assert([...view.root.querySelectorAll('.observation-trends__point')].every(point=>point.getBoundingClientRect().right<legend.left),'Resized legend obscures lines');
+  }
   const ids=[...document.querySelectorAll("[id]")].map(node=>node.id);assert(new Set(ids).size===ids.length,"Duplicate IDs including portals/overlays");
   header.destroy();view.destroy();view.destroy();card.remove();assert(!document.querySelector('.visualization-overlay')&&!document.querySelector('[role="tooltip"]'),item.id+" leaked portals/dialogs");
   for(const reject of [false,true]){

@@ -28,7 +28,7 @@ export const CHART_FILTER_DEFINITIONS = freeze({
   },
   t2: {
     season: {
-      label: "Season", type: "enum", control: "select", default: "all",
+      label: "Season", type: "enum", control: null, default: "all",
       options: [
         { value: "all", label: "All", months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
         { value: "spring", label: "Spring (Mar–May)", months: [3, 4, 5] },

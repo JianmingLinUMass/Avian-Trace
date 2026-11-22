@@ -1,3 +1,21 @@
+import { CHART_FILTER_DEFINITIONS } from "../../filters/filter-definitions.js";
+
+const colors = ["#E67E22", "#2E8B57", "#D4AC0D", "#D64545", "#3498DB"];
+export const TREND_DEFINITIONS = CHART_FILTER_DEFINITIONS.t2.season.options.map((season, index) =>
+  Object.freeze({ id: season.value, label: season.label, color: colors[index] }));
+
+/** Reuse the existing seasonal API; never derive annual totals by adding seasons. */
+export async function loadSeasonalTrendSeries(loadSpeciesTrend, filters) {
+  const rows = await Promise.all(TREND_DEFINITIONS.map(trend => loadSpeciesTrend(
+    filters.countyCode || filters.stateCode, filters.countyCode ? "county" : "state",
+    filters.taxonId, filters.startYear, filters.endYear, trend.id
+  )));
+  if (rows.every(series => !series.length)) return [];
+  return TREND_DEFINITIONS.map((trend, index) => ({ ...trend,
+    series: buildYearlyTrendSeries(rows[index], filters.startYear, filters.endYear)
+  }));
+}
+
 /** Keep unavailable years as gaps; only explicit processed zero totals become zero points. */
 export function buildYearlyTrendSeries(rows, startYear, endYear) {
   if (!Number.isInteger(startYear) || !Number.isInteger(endYear) || startYear > endYear) throw new Error("Invalid year range");

@@ -37,8 +37,9 @@ async function run(){
  await until(()=>!root.querySelector('[data-panel="holiday"] [aria-busy="true"]'));
  store.setChart('t4',{candidateLocationIds:candidates});await until(()=>root.querySelectorAll('.combination-chart__combination').length===10);
  report.push('T1 keyboard selection links map, bars and header; all statewide counties retained');
- const beforeLocal=calls.length;store.setChart('t2',{season:'winter'});await until(()=>calls.length>beforeLocal);await until(()=>!root.querySelector('[data-panel="trends"] [aria-busy="true"]'));
- assert(calls.slice(beforeLocal).every(call=>call.name==='loadSpeciesTrend'),'Trend season affected unrelated views');
+ const beforeLocal=calls.length;store.setChart('t2',{season:'winter'});await settle();await until(()=>!root.querySelector('[data-panel="trends"] [aria-busy="true"]'));
+ assert(calls.length===beforeLocal,'Trend highlight unnecessarily reloaded data');
+ assert(root.querySelector('[data-panel="trends"] .observation-trends__legend-item.is-selected').dataset.season==='winter','Trend highlight did not update');
  const beforeSpecies=calls.length;store.setShared({taxonId:'avibase-00AF5DA1'});await until(()=>calls.length>=beforeSpecies+2);assert(calls.slice(beforeSpecies).every(call=>['loadSpeciesTrend','loadHolidayObservations'].includes(call.name)),'Shared species restricted heatmap/T1/T4');
  await until(()=>!root.querySelector('[aria-busy="true"]'));
  const beforeYears=calls.length;store.setShared({startYear:2015});await until(()=>calls.length>=beforeYears+3);assert(calls.slice(beforeYears).every(call=>['loadSpeciesTrend','loadHolidayObservations','loadSpeciesHeatmap'].includes(call.name)),'Shared years affected fixed-coverage views');

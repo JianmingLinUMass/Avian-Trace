@@ -76,8 +76,9 @@ async function run() {
   views.forEach((view,index)=>assert(JSON.stringify(appearance(view.root))===JSON.stringify(appearances[cases[index][0]]),"Cross-view CSS collision: "+cases[index][0]));
   const ids=[...fixture.querySelectorAll("[id]")].map(node=>node.id);assert(new Set(ids).size===ids.length,"Duplicate IDs across views");
   const count=calls.length;store.setChart("t2",{season:"winter"});
-  await until(()=>calls.length>count&&!views[2].root.querySelector('[aria-busy="true"]'));
-  assert(calls.slice(count).every(name=>name==="loadSpeciesTrend"),"Season changed an unrelated view");
+  await settle();
+  assert(calls.length===count,"Season highlight unnecessarily reloaded views");
+  assert(views[2].root.querySelector(".observation-trends__legend-item.is-selected").dataset.season==="winter","Season highlight did not update");
   store.setShared({countyCode:"US-MA-025"});await settle();
   assert(views[0].root.querySelectorAll('.county-bars__county').length===14,"County selection filtered the statewide bars");
   assert(views[0].root.querySelectorAll('.county-bars__county.is-selected').length===1,"Shared county highlight did not update");

@@ -10,3 +10,11 @@
 .observation-trends__point:focus { outline: none; }
 .observation-trends__point:focus-visible .observation-trends__dot { stroke: #c2410c; stroke-width: 3; }
 .observation-trends__tooltip { position: fixed; z-index: 10; box-sizing: border-box; width: max-content; max-width: min(280px, calc(100vw - 32px)); padding: 10px 12px; border-radius: 5px; background: #111827; color: white; font: 14px/1.5 system-ui, sans-serif; pointer-events: none; }
+
+.observation-trends__line, .observation-trends__point { cursor: pointer; }
+.observation-trends__legend-item { cursor: pointer; font: 11px system-ui, sans-serif; }
+.observation-trends__legend-target { fill: transparent; stroke: transparent; }
+.observation-trends__legend-item.is-selected { font-weight: 700; }
+.observation-trends__legend-item.is-selected .observation-trends__legend-target { fill: #f1f5f9; }
+.observation-trends__legend-item:focus-visible { outline: none; }
+.observation-trends__legend-item:focus-visible .observation-trends__legend-target { stroke: #2563eb; stroke-width: 2; }
