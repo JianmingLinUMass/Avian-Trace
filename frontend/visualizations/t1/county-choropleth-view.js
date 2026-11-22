@@ -17,6 +17,12 @@ const HTML = `
 
 export function mountCountyChoropleth({ container: host, presentation = "standalone", store, data, geography, taxa, d3 = globalThis.d3, topojson = globalThis.topojson, sizing = {} }) {
   const frame = createVisualizationFrame({ container: host, html: HTML, presentation, className: "county-richness-page" });
+  const resetButton = document.createElement("button");
+  resetButton.type = "button";
+  resetButton.textContent = "Reset";
+  resetButton.addEventListener("click", () => chart?.resetZoom());
+  frame.controls.append(resetButton);
+
   const { elements } = frame;
   let disposed = false;
   const { loadCountyRichness } = data;
